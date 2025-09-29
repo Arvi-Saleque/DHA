@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model SiteSetting {
+  id          Int     @id @default(1)
+  headerTitle String  @default("Madrasa Management System")
+  // Add more site-wide settings as needed
+}
+
+model HeroSection {
+  id          Int      @id @default(1)        // single row app-wide
+  titleLine1  String
+  titleLine2  String
+  subtitle    String
+  bgImageUrl  String
+  cta1Text    String
+  cta1Href    String
+  cta2Text    String
+  cta2Href    String
+  features    Json                              // [{title, description, icon?}]
+  updatedAt   DateTime @updatedAt
+}
+
+model AboutSection {
+  id                 Int      @id @default(1)   // single row app-wide
+  mission            String
+  vision             String
+  description        String
+  yearEstablished    String   @default("2010")
+  totalStudents      String   @default("500+")
+  graduatedStudents  String   @default("1200+")
+  qualifiedTeachers  String   @default("25")
+  updatedAt          DateTime @updatedAt
+}
