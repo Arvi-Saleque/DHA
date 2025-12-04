@@ -4,12 +4,13 @@ import NewsEvent from "@/models/NewsEvent";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     await connectDB();
 
-    const newsEvent = await NewsEvent.findOne({ slug: params.slug });
+    const { slug } = await params;
+    const newsEvent = await NewsEvent.findOne({ slug });
 
     if (!newsEvent) {
       return NextResponse.json(
