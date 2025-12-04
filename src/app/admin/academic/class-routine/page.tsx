@@ -1,0 +1,274 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import DashboardLayout from '@/components/admin/DashboardLayout';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Pencil, Trash2, Plus, Search } from 'lucide-react';
+
+interface ClassRoutine {
+  _id: string;
+  className: string;
+  routineName: string;
+  pdfUrl: string;
+  isActive: boolean;
+}
+
+const classes = ['Play Group', 'Nursery', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7'];
+
+export default function ClassRoutineManagement() {
+  const [classRoutines, setClassRoutines] = useState<ClassRoutine[]>([]);
+  const [filteredClassRoutines, setFilteredClassRoutines] = useState<ClassRoutine[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingClassRoutine, setEditingClassRoutine] = useState<ClassRoutine | null>(null);
+  const [formData, setFormData] = useState({
+    className: '',
+    routineName: '',
+    pdfUrl: '',
+  });
+
+  useEffect(() => {
+    fetchClassRoutines();
+  }, []);
+
+  useEffect(() => {
+    const filtered = classRoutines.filter((routine) =>
+      routine.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      routine.routineName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredClassRoutines(filtered);
+  }, [searchTerm, classRoutines]);
+
+  const fetchClassRoutines = async () => {
+    try {
+      const response = await fetch('/api/class-routine');
+      const data = await response.json();
+      setClassRoutines(data);
+      setFilteredClassRoutines(data);
+    } catch (error) {
+      console.error('Error fetching class routines:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const classRoutineData = {
+      className: formData.className,
+      routineName: formData.routineName,
+      pdfUrl: formData.pdfUrl,
+    };
+
+    try {
+      if (editingClassRoutine) {
+        await fetch('/api/class-routine', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...classRoutineData, _id: editingClassRoutine._id }),
+        });
+      } else {
+        await fetch('/api/class-routine', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(classRoutineData),
+        });
+      }
+      
+      fetchClassRoutines();
+      setIsDialogOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error('Error saving class routine:', error);
+    }
+  };
+
+  const handleEdit = (classRoutine: ClassRoutine) => {
+    setEditingClassRoutine(classRoutine);
+    setFormData({
+      className: classRoutine.className,
+      routineName: classRoutine.routineName,
+      pdfUrl: classRoutine.pdfUrl,
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this class routine?')) {
+      try {
+        await fetch(`/api/class-routine?id=${id}`, { method: 'DELETE' });
+        fetchClassRoutines();
+      } catch (error) {
+        console.error('Error deleting class routine:', error);
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      className: '',
+      routineName: '',
+      pdfUrl: '',
+    });
+    setEditingClassRoutine(null);
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      resetForm();
+    }
+  };
+
+  return (
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Class Routine Management</h1>
+        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Class Routine
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>{editingClassRoutine ? 'Edit Class Routine' : 'Add New Class Routine'}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="className">Class</Label>
+                <Select
+                  value={formData.className}
+                  onValueChange={(value) => setFormData({ ...formData, className: value })}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select class" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {classes.map((cls) => (
+                      <SelectItem key={cls} value={cls}>
+                        {cls}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="routineName">Routine Name</Label>
+                <Input
+                  id="routineName"
+                  value={formData.routineName}
+                  onChange={(e) => setFormData({ ...formData, routineName: e.target.value })}
+                  placeholder="e.g., Weekly Schedule, Fall 2025 Routine"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="pdfUrl">Google Drive PDF URL</Label>
+                <Input
+                  id="pdfUrl"
+                  value={formData.pdfUrl}
+                  onChange={(e) => setFormData({ ...formData, pdfUrl: e.target.value })}
+                  placeholder="https://drive.google.com/file/d/..."
+                  required
+                />
+                <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-800">
+                  <p className="font-semibold mb-1">Google Drive Setup:</p>
+                  <ol className="list-decimal ml-4 space-y-1">
+                    <li>Upload class routine PDF to Google Drive</li>
+                    <li>Right-click → Share → Change to "Anyone with the link"</li>
+                    <li>Copy the link and paste here</li>
+                    <li>Link format: https://drive.google.com/file/d/FILE_ID/view</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => handleDialogClose(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  {editingClassRoutine ? 'Update' : 'Create'}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Class Routine Overview</CardTitle>
+          <div className="flex items-center space-x-2">
+            <Search className="h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search by class or routine name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Class</TableHead>
+                <TableHead>Routine Name</TableHead>
+                <TableHead>PDF URL</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredClassRoutines.map((routine) => (
+                <TableRow key={routine._id}>
+                  <TableCell className="font-medium">{routine.className}</TableCell>
+                  <TableCell>{routine.routineName}</TableCell>
+                  <TableCell>
+                    <a 
+                      href={routine.pdfUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      View PDF
+                    </a>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(routine)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(routine._id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      </div>
+    </DashboardLayout>
+  );
+}
