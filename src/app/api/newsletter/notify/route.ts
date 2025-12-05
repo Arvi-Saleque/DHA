@@ -3,10 +3,10 @@ import connectDB from "@/lib/mongodb";
 import Newsletter from "@/models/Newsletter";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // POST - Send notification to all subscribers
 export async function POST(request: Request) {
+  // Initialize Resend only when the route is called, not at build time
+  const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     await connectDB();
     const body = await request.json();
