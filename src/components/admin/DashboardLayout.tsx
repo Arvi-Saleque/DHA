@@ -29,6 +29,7 @@ import {
   Target,
   Phone,
   Star,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -108,6 +109,11 @@ const menuItems: MenuItem[] = [
     title: "Contact Us",
     icon: <Phone className="h-5 w-5" />,
     href: "/admin/contact",
+  },
+  {
+    title: "Newsletter",
+    icon: <Mail className="h-5 w-5" />,
+    href: "/admin/newsletter",
   },
 ];
 

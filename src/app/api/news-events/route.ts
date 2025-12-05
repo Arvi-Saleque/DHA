@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import NewsEvent from "@/models/NewsEvent";
+import { sendAutomaticNotification } from "@/lib/newsletter";
 
 // GET: Fetch all news/events
 export async function GET(request: NextRequest) {
@@ -38,6 +39,14 @@ export async function POST(request: NextRequest) {
 
     const newsEvent = await NewsEvent.create(body);
     console.log("Created:", newsEvent);
+
+    // Auto-notify subscribers
+    await sendAutomaticNotification({
+      type: 'news',
+      title: body.title || 'New News/Event Posted',
+      message: body.excerpt || body.content?.substring(0, 200) || 'Check out the latest news and events on our website.',
+      link: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/news-events/${newsEvent.slug}`
+    });
 
     return NextResponse.json(
       { message: "News/Event created successfully", newsEvent },

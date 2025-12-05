@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import ExamResult from '@/models/ExamResult';
+import { sendAutomaticNotification } from '@/lib/newsletter';
 
 // GET all exam results
 export async function GET() {
@@ -48,6 +49,14 @@ export async function POST(request: NextRequest) {
       pdfUrl,
       passPercentage,
       isActive: true
+    });
+
+    // Auto-notify subscribers
+    await sendAutomaticNotification({
+      type: 'academic',
+      title: 'Exam Results Published',
+      message: `${examName} results for ${className} have been published. Pass rate: ${passPercentage}%. View the complete results now.`,
+      link: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/academic/results`
     });
 
     return NextResponse.json(result, { status: 201 });

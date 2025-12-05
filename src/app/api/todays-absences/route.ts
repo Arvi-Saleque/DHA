@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import TodaysAbsence from '@/models/TodaysAbsence';
+import { sendAutomaticNotification } from '@/lib/newsletter';
 
 // GET - Fetch all active absences
 export async function GET() {
@@ -39,6 +40,13 @@ export async function POST(req: NextRequest) {
       title,
       imageUrl,
     });
+    
+    // Send automatic notification to subscribers
+    await sendAutomaticNotification(
+      'Absence Report Published',
+      `${title} - Absence report for ${className} ${section}.`,
+      `/absences`
+    );
 
     return NextResponse.json(
       { message: 'Absence created successfully', absence },

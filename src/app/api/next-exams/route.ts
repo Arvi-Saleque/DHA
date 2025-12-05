@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import NextExam from "@/models/NextExam";
+import { sendAutomaticNotification } from '@/lib/newsletter';
 
 export async function GET() {
   try {
@@ -47,6 +48,13 @@ export async function POST(request: Request) {
       grade,
       isActive: true,
     });
+    
+    // Send automatic notification to subscribers
+    await sendAutomaticNotification(
+      'New Exam Scheduled',
+      `${subject} exam scheduled for ${grade} on ${new Date(date).toLocaleDateString()} at ${time}.`,
+      `/next-exam`
+    );
 
     return NextResponse.json(
       { success: true, message: "Exam created successfully", exam },
