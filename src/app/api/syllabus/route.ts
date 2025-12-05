@@ -18,14 +18,15 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
     const body = await request.json();
-    const syllabus = await Syllabus.create(body);
+    const syllabus = await Syllabus.create(body) as any;
     
     // Send automatic notification to subscribers
-    await sendAutomaticNotification(
-      'New Syllabus Published',
-      `New syllabus for ${syllabus.subject} has been published for ${syllabus.className}.`,
-      `/academic/syllabus?class=${encodeURIComponent(syllabus.className)}`
-    );
+    await sendAutomaticNotification({
+      type: 'academic',
+      title: 'New Syllabus Published',
+      message: `New syllabus for ${syllabus.subject} has been published for ${syllabus.className}.`,
+      link: `/academic/syllabus?class=${encodeURIComponent(syllabus.className)}`
+    });
     
     return NextResponse.json(syllabus, { status: 201 });
   } catch (error) {

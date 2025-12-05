@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log("POST body:", body);
 
-    const newsEvent = await NewsEvent.create(body);
+    const newsEvent = await NewsEvent.create(body) as any;
     console.log("Created:", newsEvent);
 
     // Auto-notify subscribers

@@ -33,14 +33,15 @@ export async function POST(request: NextRequest) {
       month,
       pdfUrl,
       isActive: true,
-    });
+    }) as any;
     
     // Send automatic notification to subscribers
-    await sendAutomaticNotification(
-      'New Academic Calendar Published',
-      `Academic calendar for ${month} has been published.`,
-      `/academic/calendar`
-    );
+    await sendAutomaticNotification({
+      type: 'academic',
+      title: 'New Academic Calendar Published',
+      message: `Academic calendar for ${month} has been published.`,
+      link: `/academic/calendar`
+    });
 
     return NextResponse.json(calendar, { status: 201 });
   } catch (error) {

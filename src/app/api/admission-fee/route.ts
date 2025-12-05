@@ -36,14 +36,15 @@ export async function POST(request: NextRequest) {
       examFee,
       otherFees: otherFees || 0,
       isActive: true,
-    });
+    }) as any;
     
     // Send automatic notification to subscribers
-    await sendAutomaticNotification(
-      'New Admission Fee Structure',
-      `Admission fee structure for ${className} has been updated.`,
-      `/academic/admission-fee?class=${encodeURIComponent(className)}`
-    );
+    await sendAutomaticNotification({
+      type: 'academic',
+      title: 'New Admission Fee Structure',
+      message: `Admission fee structure for ${className} has been updated.`,
+      link: `/academic/admission-fee?class=${encodeURIComponent(className)}`
+    });
 
     return NextResponse.json(fee, { status: 201 });
   } catch (error) {
