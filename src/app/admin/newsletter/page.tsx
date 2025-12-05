@@ -122,46 +122,46 @@ export default function NewsletterPage() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Newsletter Management</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Newsletter Management</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-2">
             Manage subscribers and send notifications about updates
           </p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Subscribers</p>
-                  <p className="text-3xl font-bold text-gray-900">{subscribers.length}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Total Subscribers</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900">{subscribers.length}</p>
                 </div>
-                <Users className="h-10 w-10 text-blue-500" />
+                <Users className="h-8 w-8 sm:h-10 sm:w-10 text-blue-500" />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Active</p>
-                  <p className="text-3xl font-bold text-green-600">
+                  <p className="text-xs sm:text-sm text-gray-600">Active</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-green-600">
                     {subscribers.filter(s => s.status === "active").length}
                   </p>
                 </div>
-                <CheckCircle className="h-10 w-10 text-green-500" />
+                <CheckCircle className="h-8 w-8 sm:h-10 sm:w-10 text-green-500" />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">This Month</p>
-                  <p className="text-3xl font-bold text-blue-600">
+                  <p className="text-xs sm:text-sm text-gray-600">This Month</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-blue-600">
                     {subscribers.filter(s => {
                       const date = new Date(s.subscribedAt);
                       const now = new Date();
@@ -170,7 +170,7 @@ export default function NewsletterPage() {
                     }).length}
                   </p>
                 </div>
-                <Mail className="h-10 w-10 text-blue-500" />
+                <Mail className="h-8 w-8 sm:h-10 sm:w-10 text-blue-500" />
               </div>
             </CardContent>
           </Card>
@@ -286,24 +286,24 @@ export default function NewsletterPage() {
                 {subscribers.map((subscriber) => (
                   <div
                     key={subscriber._id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg hover:bg-gray-50 gap-3"
                   >
-                    <div className="flex items-center gap-3">
-                      <Mail className="h-5 w-5 text-gray-400" />
-                      <div>
-                        <p className="font-medium text-gray-900">{subscriber.email}</p>
-                        <p className="text-sm text-gray-500">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                      <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-gray-900 text-sm sm:text-base break-all">{subscriber.email}</p>
+                        <p className="text-xs sm:text-sm text-gray-500">
                           Subscribed {new Date(subscriber.subscribedAt).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 self-end sm:self-auto">
                       <Badge
-                        className={
+                        className={`text-xs ${
                           subscriber.status === "active"
                             ? "bg-green-500"
                             : "bg-gray-500"
-                        }
+                        }`}
                       >
                         {subscriber.status}
                       </Badge>

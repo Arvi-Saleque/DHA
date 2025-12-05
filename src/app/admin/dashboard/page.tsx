@@ -112,60 +112,60 @@ export default function AdminDashboard() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Contact Messages</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Contact Messages</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-2">
             Messages from visitors using the &quot;Send us a Message&quot; form
           </p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Messages</p>
-                  <p className="text-3xl font-bold text-gray-900">{messages.length}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Total Messages</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900">{messages.length}</p>
                 </div>
-                <Mail className="h-10 w-10 text-blue-500" />
+                <Mail className="h-8 w-8 sm:h-10 sm:w-10 text-blue-500" />
               </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Unread</p>
-                  <p className="text-3xl font-bold text-orange-600">{unreadCount}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Unread</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-orange-600">{unreadCount}</p>
                 </div>
-                <Clock className="h-10 w-10 text-orange-500" />
+                <Clock className="h-8 w-8 sm:h-10 sm:w-10 text-orange-500" />
               </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Replied</p>
-                  <p className="text-3xl font-bold text-green-600">
+                  <p className="text-xs sm:text-sm text-gray-600">Replied</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-green-600">
                     {messages.filter(m => m.status === "replied").length}
                   </p>
                 </div>
-                <CheckCircle className="h-10 w-10 text-green-500" />
+                <CheckCircle className="h-8 w-8 sm:h-10 sm:w-10 text-green-500" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Messages List */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Messages List */}
-          <Card>
-            <CardHeader className="border-b">
-              <CardTitle className="flex items-center gap-2">
-                <Mail className="h-5 w-5 text-blue-600" />
+          <Card className="lg:order-1">
+            <CardHeader className="border-b p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                 All Messages
               </CardTitle>
             </CardHeader>
@@ -175,7 +175,7 @@ export default function AdminDashboard() {
                   <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                 </div>
               ) : messages.length === 0 ? (
-                <div className="text-center py-12">
+                <div className="text-center py-12 px-4">
                   <Mail className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-500">No messages yet</p>
                   <p className="text-sm text-gray-400 mt-1">
@@ -183,7 +183,7 @@ export default function AdminDashboard() {
                   </p>
                 </div>
               ) : (
-                <div className="max-h-[600px] overflow-y-auto">
+                <div className="max-h-[500px] sm:max-h-[600px] overflow-y-auto">
                   {messages.map((message) => (
                     <div
                       key={message._id}
@@ -193,11 +193,11 @@ export default function AdminDashboard() {
                           updateMessageStatus(message._id, "read");
                         }
                       }}
-                      className={`p-4 border-b hover:bg-gray-50 cursor-pointer transition-colors ${
+                      className={`p-3 sm:p-4 border-b hover:bg-gray-50 cursor-pointer transition-colors ${
                         selectedMessage?._id === message._id ? "bg-blue-50 border-l-4 border-l-blue-600" : ""
                       } ${message.status === "unread" ? "bg-orange-50" : ""}`}
                     >
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start justify-between gap-2 sm:gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <h4 className="font-semibold text-gray-900 truncate">
@@ -227,34 +227,34 @@ export default function AdminDashboard() {
           </Card>
 
           {/* Message Detail */}
-          <Card>
-            <CardHeader className="border-b">
-              <CardTitle className="flex items-center gap-2">
+          <Card className="lg:order-2">
+            <CardHeader className="border-b p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 Message Details
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               {selectedMessage ? (
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   {/* Header */}
                   <div>
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-1">
+                    <div className="flex items-start justify-between mb-4 gap-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 break-words">
                           {selectedMessage.subject}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs sm:text-sm text-gray-500">
                           {formatDate(selectedMessage.createdAt)}
                         </p>
                       </div>
                       <Badge
-                        className={
+                        className={`shrink-0 ${
                           selectedMessage.status === "unread"
                             ? "bg-orange-500"
                             : selectedMessage.status === "replied"
                             ? "bg-green-500"
                             : "bg-blue-500"
-                        }
+                        }`}
                       >
                         {selectedMessage.status}
                       </Badge>
@@ -263,21 +263,21 @@ export default function AdminDashboard() {
 
                   {/* Sender Info */}
                   <div className="space-y-3 border-t pt-4">
-                    <div className="flex items-center gap-3">
-                      <User className="h-5 w-5 text-gray-400" />
-                      <div>
-                        <p className="text-sm text-gray-500">Name</p>
-                        <p className="font-medium text-gray-900">{selectedMessage.name}</p>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <User className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs sm:text-sm text-gray-500">Name</p>
+                        <p className="font-medium text-gray-900 break-words">{selectedMessage.name}</p>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3">
-                      <Mail className="h-5 w-5 text-gray-400" />
-                      <div>
-                        <p className="text-sm text-gray-500">Email</p>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs sm:text-sm text-gray-500">Email</p>
                         <a
                           href={`mailto:${selectedMessage.email}`}
-                          className="font-medium text-blue-600 hover:underline"
+                          className="font-medium text-blue-600 hover:underline break-all text-sm sm:text-base"
                         >
                           {selectedMessage.email}
                         </a>
@@ -285,10 +285,10 @@ export default function AdminDashboard() {
                     </div>
                     
                     {selectedMessage.phone && (
-                      <div className="flex items-center gap-3">
-                        <Phone className="h-5 w-5 text-gray-400" />
-                        <div>
-                          <p className="text-sm text-gray-500">Phone</p>
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs sm:text-sm text-gray-500">Phone</p>
                           <a
                             href={`tel:${selectedMessage.phone}`}
                             className="font-medium text-blue-600 hover:underline"
@@ -302,15 +302,15 @@ export default function AdminDashboard() {
 
                   {/* Message */}
                   <div className="border-t pt-4">
-                    <p className="text-sm text-gray-500 mb-2">Message</p>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-gray-900 whitespace-pre-wrap">{selectedMessage.message}</p>
+                    <p className="text-xs sm:text-sm text-gray-500 mb-2">Message</p>
+                    <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                      <p className="text-sm sm:text-base text-gray-900 whitespace-pre-wrap break-words">{selectedMessage.message}</p>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="space-y-3 border-t pt-4">
-                    <div className="flex gap-3">
+                  <div className="space-y-2 sm:space-y-3 border-t pt-4">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                       <Button
                         onClick={() => {
                           const subject = encodeURIComponent(`Re: ${selectedMessage.subject}`);
@@ -319,7 +319,7 @@ export default function AdminDashboard() {
                           );
                           window.location.href = `mailto:${selectedMessage.email}?subject=${subject}&body=${body}`;
                         }}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700"
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-sm sm:text-base"
                       >
                         <Reply className="h-4 w-4 mr-2" />
                         Reply via Email
@@ -328,7 +328,7 @@ export default function AdminDashboard() {
                         <Button
                           onClick={() => updateMessageStatus(selectedMessage._id, "replied")}
                           variant="outline"
-                          className="flex-1"
+                          className="flex-1 text-sm sm:text-base"
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Mark as Replied
@@ -338,7 +338,7 @@ export default function AdminDashboard() {
                     <Button
                       onClick={() => deleteMessage(selectedMessage._id)}
                       variant="destructive"
-                      className="w-full"
+                      className="w-full text-sm sm:text-base"
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       Delete Message
@@ -346,7 +346,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-12">
+                <div className="text-center py-12 px-4">
                   <Mail className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-500">Select a message to view details</p>
                 </div>

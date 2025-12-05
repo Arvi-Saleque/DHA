@@ -171,6 +171,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 {item.href ? (
                   <Link
                     href={item.href}
+                    onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
                       pathname === item.href
                         ? "bg-cyan-50 text-cyan-600"
@@ -202,6 +203,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                           <Link
                             key={subitem.href}
                             href={subitem.href}
+                            onClick={() => setSidebarOpen(false)}
                             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
                               pathname === subitem.href
                                 ? "bg-cyan-50 text-cyan-600"
@@ -245,8 +247,31 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
       {/* Main Content */}
       <div className="lg:ml-64">
+        {/* Mobile Header */}
+        <header className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-white" />
+            </div>
+            <span className="font-bold text-lg">DHA Admin</span>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="text-gray-400 hover:text-red-600 transition-colors"
+            title="Logout"
+          >
+            <LogOut className="h-5 w-5" />
+          </button>
+        </header>
+
         {/* Content */}
-        <main className="p-6">{children}</main>
+        <main className="p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );
