@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import AcademicCalendar from '@/models/AcademicCalendar';
+import { sendAutomaticNotification } from '@/lib/newsletter';
 
 // GET - Fetch all academic calendars
 export async function GET() {
@@ -33,6 +34,13 @@ export async function POST(request: NextRequest) {
       pdfUrl,
       isActive: true,
     });
+    
+    // Send automatic notification to subscribers
+    await sendAutomaticNotification(
+      'New Academic Calendar Published',
+      `Academic calendar for ${month} has been published.`,
+      `/academic/calendar`
+    );
 
     return NextResponse.json(calendar, { status: 201 });
   } catch (error) {

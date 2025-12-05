@@ -58,21 +58,40 @@ const contactInfo = {
 export default function Footer() {
   const [email, setEmail] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [message, setMessage] = React.useState("");
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
 
     setIsSubmitting(true);
-    // Add your newsletter subscription logic here
-    console.log("Subscribing:", email);
+    setMessage("");
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setMessage(result.message);
+        setEmail("");
+      } else {
+        setMessage(result.message || "Failed to subscribe. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error subscribing:", error);
+      setMessage("Failed to subscribe. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      setEmail("");
-      alert("Thank you for subscribing!");
-    }, 1000);
+      // Clear message after 5 seconds
+      setTimeout(() => setMessage(""), 5000);
+    }
   };
 
   return (
@@ -200,6 +219,11 @@ export default function Footer() {
                   </>
                 )}
               </Button>
+              {message && (
+                <p className={`text-xs ${message.includes("success") || message.includes("subscribed") ? "text-green-600" : "text-red-600"}`}>
+                  {message}
+                </p>
+              )}
             </form>
           </div>
         </div>

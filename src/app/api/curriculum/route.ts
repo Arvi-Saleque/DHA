@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Curriculum from '@/models/Curriculum';
+import { sendAutomaticNotification } from '@/lib/newsletter';
 
 export async function GET() {
   try {
@@ -18,6 +19,14 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const body = await request.json();
     const curriculum = await Curriculum.create(body);
+    
+    // Send automatic notification to subscribers
+    await sendAutomaticNotification(
+      'New Curriculum Published',
+      `New curriculum has been published for ${curriculum.className}.`,
+      `/academic/curriculum?class=${encodeURIComponent(curriculum.className)}`
+    );
+    
     return NextResponse.json(curriculum, { status: 201 });
   } catch (error) {
     console.error('Error creating curriculum:', error);

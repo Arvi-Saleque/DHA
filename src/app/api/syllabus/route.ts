@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Syllabus from '@/models/Syllabus';
+import { sendAutomaticNotification } from '@/lib/newsletter';
 
 export async function GET() {
   try {
@@ -18,6 +19,14 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const body = await request.json();
     const syllabus = await Syllabus.create(body);
+    
+    // Send automatic notification to subscribers
+    await sendAutomaticNotification(
+      'New Syllabus Published',
+      `New syllabus for ${syllabus.subject} has been published for ${syllabus.className}.`,
+      `/academic/syllabus?class=${encodeURIComponent(syllabus.className)}`
+    );
+    
     return NextResponse.json(syllabus, { status: 201 });
   } catch (error) {
     console.error('Error creating syllabus:', error);

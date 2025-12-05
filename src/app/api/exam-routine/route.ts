@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import ExamRoutine from '@/models/ExamRoutine';
+import { sendAutomaticNotification } from '@/lib/newsletter';
 
 export async function GET() {
   try {
@@ -18,6 +19,15 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const body = await request.json();
     const examRoutine = await ExamRoutine.create(body);
+    
+    // Auto-send notification to subscribers
+    await sendAutomaticNotification({
+      type: 'academic',
+      title: 'New Exam Routine Added',
+      message: `A new exam routine has been added for ${body.className} - ${body.examName}. Check the website for complete details.`,
+      link: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/academic/exams`
+    });
+    
     return NextResponse.json(examRoutine, { status: 201 });
   } catch (error) {
     console.error('Error creating exam routine:', error);
@@ -40,6 +50,14 @@ export async function PUT(request: NextRequest) {
     if (!examRoutine) {
       return NextResponse.json({ error: 'Exam routine not found' }, { status: 404 });
     }
+    
+    // Auto-send notification to subscribers
+    await sendAutomaticNotification({
+      type: 'academic',
+      title: 'Exam Routine Updated',
+      message: `The exam routine for ${examRoutine.className} - ${examRoutine.examName} has been updated. Please check the latest schedule.`,
+      link: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/academic/exams`
+    });
     
     return NextResponse.json(examRoutine);
   } catch (error) {

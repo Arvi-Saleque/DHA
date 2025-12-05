@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Assignment from "@/models/Assignment";
+import { sendAutomaticNotification } from "@/lib/newsletter";
 
 export async function GET() {
   try {
@@ -47,6 +48,14 @@ export async function POST(request: Request) {
       teacherName,
       teacher: "674d1a2b3c4d5e6f7a8b9c0d", // Default teacher ID for now
       isActive: true,
+    });
+
+    // Auto-notify subscribers
+    await sendAutomaticNotification({
+      type: 'academic',
+      title: 'New Assignment Posted',
+      message: `A new ${subject} assignment has been posted for ${className}. Title: ${title}. Due date: ${new Date(deadline).toLocaleDateString()}.`,
+      link: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/academic/assignments`
     });
 
     return NextResponse.json(

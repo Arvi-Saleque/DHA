@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import ClassRoutine from '@/models/ClassRoutine';
+import { sendAutomaticNotification } from '@/lib/newsletter';
 
 export async function GET() {
   try {
@@ -18,6 +19,15 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const body = await request.json();
     const classRoutine = await ClassRoutine.create(body);
+    
+    // Auto-notify subscribers
+    await sendAutomaticNotification({
+      type: 'academic',
+      title: 'New Class Routine Available',
+      message: `The class routine for ${body.className} - ${body.routineName} is now available. Check the updated schedule on our website.`,
+      link: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/academic/routine`
+    });
+    
     return NextResponse.json(classRoutine, { status: 201 });
   } catch (error) {
     console.error('Error creating class routine:', error);

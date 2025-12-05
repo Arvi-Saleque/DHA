@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Scholarship from '@/models/Scholarship';
+import { sendAutomaticNotification } from '@/lib/newsletter';
 
 // GET - Fetch all scholarships
 export async function GET() {
@@ -37,6 +38,14 @@ export async function POST(request: NextRequest) {
       amount,
       date,
       isActive: true,
+    });
+
+    // Auto-notify subscribers
+    await sendAutomaticNotification({
+      type: 'academic',
+      title: 'New Scholarship Awarded',
+      message: `A scholarship of ${amount} BDT has been awarded to ${studentName} from ${className}. Congratulations!`,
+      link: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/academic/scholarship`
     });
 
     return NextResponse.json(scholarship, { status: 201 });
