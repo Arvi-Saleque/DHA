@@ -6,205 +6,351 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  FileText,
-  Calendar,
-  UserX,
-  BookOpen,
+  Mail,
+  Trash2,
+  CheckCircle,
   Clock,
   Loader2,
+  Phone,
+  User,
+  Reply,
 } from "lucide-react";
 
-interface Assignment {
+interface ContactMessage {
   _id: string;
+  name: string;
+  email: string;
+  phone?: string;
   subject: string;
-  class: string;
-  title: string;
-  deadline: string;
-  teacherName: string;
-  status: string;
+  message: string;
+  status: "unread" | "read" | "replied";
+  createdAt: string;
 }
 
 export default function AdminDashboard() {
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
 
   useEffect(() => {
-    fetchAssignments();
+    fetchMessages();
   }, []);
 
-  const fetchAssignments = async () => {
+  const fetchMessages = async () => {
     try {
-      const response = await fetch("/api/assignments");
+      const response = await fetch("/api/contact-messages");
       const data = await response.json();
       if (data.success) {
-        setAssignments(data.assignments);
+        setMessages(data.messages);
       }
     } catch (error) {
-      console.error("Error fetching assignments:", error);
+      console.error("Error fetching messages:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDeadline = (deadline: string) => {
-    const date = new Date(deadline);
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    if (date.toDateString() === tomorrow.toDateString()) {
-      return `Tomorrow, ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
+  const updateMessageStatus = async (id: string, status: string) => {
+    try {
+      const response = await fetch(`/api/contact-messages/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      
+      if (response.ok) {
+        fetchMessages();
+      }
+    } catch (error) {
+      console.error("Error updating message:", error);
     }
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
+
+  const deleteMessage = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this message?")) return;
+    
+    try {
+      const response = await fetch(`/api/contact-messages/${id}`, {
+        method: "DELETE",
+      });
+      
+      if (response.ok) {
+        fetchMessages();
+        if (selectedMessage?._id === id) {
+          setSelectedMessage(null);
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting message:", error);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    
+    return date.toLocaleDateString("en-US", { 
+      month: "short", 
+      day: "numeric", 
+      year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined 
+    });
+  };
+
+  const unreadCount = messages.filter(m => m.status === "unread").length;
 
   return (
     <DashboardLayout>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Daily Assignments */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="border-b border-gray-100 pb-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-cyan-600" />
-                Daily Assignments
-              </CardTitle>
-              <Button size="sm" variant="outline">
-                View All
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-cyan-600" />
-              </div>
-            ) : assignments.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No assignments found</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {assignments.map((assignment) => (
-                  <div
-                    key={assignment._id}
-                    className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="h-10 w-10 bg-cyan-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <BookOpen className="h-5 w-5 text-cyan-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-semibold text-gray-900">{assignment.subject}</h4>
-                        <Badge variant="outline" className="text-xs">
-                          {assignment.class}
-                        </Badge>
-                        {assignment.status === "urgent" && (
-                          <Badge className="bg-red-100 text-red-700 text-xs">Urgent</Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">{assignment.title}</p>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {formatDeadline(assignment.deadline)}
-                        </span>
-                        <span>By {assignment.teacherName}</span>
-                      </div>
-                    </div>
-                    <Button size="sm" variant="ghost" className="text-cyan-600">
-                      View
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Contact Messages</h1>
+          <p className="text-gray-600 mt-2">
+            Messages from visitors using the &quot;Send us a Message&quot; form
+          </p>
+        </div>
 
-        {/* Next Exam & Today's Absences */}
-        <div className="space-y-6">
-          {/* Next Exam */}
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
-            <CardHeader className="border-b border-gray-100 pb-4">
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-blue-600" />
-                Next Exam
-              </CardTitle>
-            </CardHeader>
             <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg">
-                  <div className="inline-flex items-center justify-center h-16 w-16 bg-blue-100 rounded-full mb-4">
-                    <Calendar className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <h3 className="font-bold text-xl text-gray-900 mb-2">Final Examination</h3>
-                  <p className="text-sm text-gray-600 mb-4">December 15, 2025</p>
-                  <Badge className="bg-blue-600">Starting in 13 days</Badge>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Messages</p>
+                  <p className="text-3xl font-bold text-gray-900">{messages.length}</p>
                 </div>
-
-                <div className="space-y-3">
-                  {[
-                    { subject: "Mathematics", date: "Dec 15", time: "9:00 AM" },
-                    { subject: "English", date: "Dec 16", time: "9:00 AM" },
-                    { subject: "Science", date: "Dec 17", time: "9:00 AM" },
-                  ].map((exam, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                    >
-                      <div>
-                        <p className="font-medium text-gray-900">{exam.subject}</p>
-                        <p className="text-xs text-gray-500">{exam.time}</p>
-                      </div>
-                      <Badge variant="outline">{exam.date}</Badge>
-                    </div>
-                  ))}
-                </div>
+                <Mail className="h-10 w-10 text-blue-500" />
               </div>
             </CardContent>
           </Card>
-
-          {/* Today's Absences */}
+          
           <Card>
-            <CardHeader className="border-b border-gray-100 pb-4">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Unread</p>
+                  <p className="text-3xl font-bold text-orange-600">{unreadCount}</p>
+                </div>
+                <Clock className="h-10 w-10 text-orange-500" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Replied</p>
+                  <p className="text-3xl font-bold text-green-600">
+                    {messages.filter(m => m.status === "replied").length}
+                  </p>
+                </div>
+                <CheckCircle className="h-10 w-10 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Messages List */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Messages List */}
+          <Card>
+            <CardHeader className="border-b">
               <CardTitle className="flex items-center gap-2">
-                <UserX className="h-5 w-5 text-red-600" />
-                Today&apos;s Absences
+                <Mail className="h-5 w-5 text-blue-600" />
+                All Messages
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="text-center py-12">
+                  <Mail className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">No messages yet</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Messages will appear here when visitors send you a message
+                  </p>
+                </div>
+              ) : (
+                <div className="max-h-[600px] overflow-y-auto">
+                  {messages.map((message) => (
+                    <div
+                      key={message._id}
+                      onClick={() => {
+                        setSelectedMessage(message);
+                        if (message.status === "unread") {
+                          updateMessageStatus(message._id, "read");
+                        }
+                      }}
+                      className={`p-4 border-b hover:bg-gray-50 cursor-pointer transition-colors ${
+                        selectedMessage?._id === message._id ? "bg-blue-50 border-l-4 border-l-blue-600" : ""
+                      } ${message.status === "unread" ? "bg-orange-50" : ""}`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-semibold text-gray-900 truncate">
+                              {message.name}
+                            </h4>
+                            {message.status === "unread" && (
+                              <Badge className="bg-orange-500 text-white text-xs">New</Badge>
+                            )}
+                            {message.status === "replied" && (
+                              <Badge className="bg-green-500 text-white text-xs">Replied</Badge>
+                            )}
+                          </div>
+                          <p className="text-sm font-medium text-gray-700 truncate mb-1">
+                            {message.subject}
+                          </p>
+                          <p className="text-sm text-gray-500 truncate mb-2">
+                            {message.message}
+                          </p>
+                          <p className="text-xs text-gray-400">{formatDate(message.createdAt)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Message Detail */}
+          <Card>
+            <CardHeader className="border-b">
+              <CardTitle className="flex items-center gap-2">
+                Message Details
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="space-y-3">
-                {[
-                  { name: "Ahmed Hassan", class: "Grade 10-A", reason: "Sick" },
-                  { name: "Fatima Noor", class: "Grade 9-B", reason: "Family Event" },
-                  { name: "Ali Raza", class: "Grade 11-A", reason: "Medical" },
-                  { name: "Sara Khan", class: "Grade 8-C", reason: "Personal" },
-                  { name: "Usman Ali", class: "Grade 10-B", reason: "Sick" },
-                ].map((student, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-red-50 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
-                        <span className="text-xs font-semibold text-red-700">
-                          {student.name.charAt(0)}
-                        </span>
-                      </div>
+              {selectedMessage ? (
+                <div className="space-y-6">
+                  {/* Header */}
+                  <div>
+                    <div className="flex items-start justify-between mb-4">
                       <div>
-                        <p className="font-medium text-sm text-gray-900">{student.name}</p>
-                        <p className="text-xs text-gray-500">{student.class}</p>
+                        <h3 className="text-xl font-bold text-gray-900 mb-1">
+                          {selectedMessage.subject}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {formatDate(selectedMessage.createdAt)}
+                        </p>
+                      </div>
+                      <Badge
+                        className={
+                          selectedMessage.status === "unread"
+                            ? "bg-orange-500"
+                            : selectedMessage.status === "replied"
+                            ? "bg-green-500"
+                            : "bg-blue-500"
+                        }
+                      >
+                        {selectedMessage.status}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Sender Info */}
+                  <div className="space-y-3 border-t pt-4">
+                    <div className="flex items-center gap-3">
+                      <User className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-500">Name</p>
+                        <p className="font-medium text-gray-900">{selectedMessage.name}</p>
                       </div>
                     </div>
-                    <Badge className="bg-red-100 text-red-700 text-xs">{student.reason}</Badge>
+                    
+                    <div className="flex items-center gap-3">
+                      <Mail className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-500">Email</p>
+                        <a
+                          href={`mailto:${selectedMessage.email}`}
+                          className="font-medium text-blue-600 hover:underline"
+                        >
+                          {selectedMessage.email}
+                        </a>
+                      </div>
+                    </div>
+                    
+                    {selectedMessage.phone && (
+                      <div className="flex items-center gap-3">
+                        <Phone className="h-5 w-5 text-gray-400" />
+                        <div>
+                          <p className="text-sm text-gray-500">Phone</p>
+                          <a
+                            href={`tel:${selectedMessage.phone}`}
+                            className="font-medium text-blue-600 hover:underline"
+                          >
+                            {selectedMessage.phone}
+                          </a>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ))}
 
-                <Button className="w-full mt-4" variant="outline" size="sm">
-                  View All Absences
-                </Button>
-              </div>
+                  {/* Message */}
+                  <div className="border-t pt-4">
+                    <p className="text-sm text-gray-500 mb-2">Message</p>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-gray-900 whitespace-pre-wrap">{selectedMessage.message}</p>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="space-y-3 border-t pt-4">
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={() => {
+                          const subject = encodeURIComponent(`Re: ${selectedMessage.subject}`);
+                          const body = encodeURIComponent(
+                            `Hi ${selectedMessage.name},\n\nThank you for contacting us.\n\n---\nOriginal Message:\n${selectedMessage.message}`
+                          );
+                          window.location.href = `mailto:${selectedMessage.email}?subject=${subject}&body=${body}`;
+                        }}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700"
+                      >
+                        <Reply className="h-4 w-4 mr-2" />
+                        Reply via Email
+                      </Button>
+                      {selectedMessage.status !== "replied" && (
+                        <Button
+                          onClick={() => updateMessageStatus(selectedMessage._id, "replied")}
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Mark as Replied
+                        </Button>
+                      )}
+                    </div>
+                    <Button
+                      onClick={() => deleteMessage(selectedMessage._id)}
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Message
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Mail className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">Select a message to view details</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
