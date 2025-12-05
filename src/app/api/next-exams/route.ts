@@ -47,14 +47,15 @@ export async function POST(request: Request) {
       room,
       grade,
       isActive: true,
-    });
+    }) as any;
     
     // Send automatic notification to subscribers
-    await sendAutomaticNotification(
-      'New Exam Scheduled',
-      `${subject} exam scheduled for ${grade} on ${new Date(date).toLocaleDateString()} at ${time}.`,
-      `/next-exam`
-    );
+    await sendAutomaticNotification({
+      type: 'academic',
+      title: 'New Exam Scheduled',
+      message: `${subject} exam scheduled for ${grade} on ${new Date(date).toLocaleDateString()} at ${time}.`,
+      link: `/next-exam`
+    });
 
     return NextResponse.json(
       { success: true, message: "Exam created successfully", exam },

@@ -39,14 +39,15 @@ export async function POST(req: NextRequest) {
       section,
       title,
       imageUrl,
-    });
+    }) as any;
     
     // Send automatic notification to subscribers
-    await sendAutomaticNotification(
-      'Absence Report Published',
-      `${title} - Absence report for ${className} ${section}.`,
-      `/absences`
-    );
+    await sendAutomaticNotification({
+      type: 'academic',
+      title: 'Absence Report Published',
+      message: `${title} - Absence report for ${className} ${section}.`,
+      link: `/absences`
+    });
 
     return NextResponse.json(
       { message: 'Absence created successfully', absence },
