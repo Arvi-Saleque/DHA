@@ -43,6 +43,46 @@ export default function Home() {
     isActive: boolean;
   }>>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
+  const [newsEvents, setNewsEvents] = useState<Array<{
+    _id: string;
+    title: string;
+    slug: string;
+    excerpt: string;
+    content: string;
+    imageUrl: string;
+    category: string;
+    date: string;
+    time?: string;
+    author: string;
+    tags: string[];
+    isActive?: boolean;
+  }>>([]);
+  const [loadingNews, setLoadingNews] = useState(true);
+  const [galleryImages, setGalleryImages] = useState<Array<{
+    _id: string;
+    title: string;
+    category: string;
+    imageUrl: string;
+    date: Date;
+    location: string;
+    description: string;
+    order: number;
+  }>>([]);
+  const [loadingGallery, setLoadingGallery] = useState(true);
+  const [aboutUsData, setAboutUsData] = useState<{
+    title: string;
+    subtitle: string;
+    description: string;
+    imageUrl: string;
+    establishedYear: string;
+    features: string[];
+    coreValues: Array<{
+      icon: string;
+      title: string;
+      description: string;
+    }>;
+  } | null>(null);
+  const [loadingAboutUs, setLoadingAboutUs] = useState(true);
   const [homePageData, setHomePageData] = useState<{
     statsSection: Array<{
       value: string;
@@ -66,6 +106,9 @@ export default function Home() {
   useEffect(() => {
     fetchHomePage();
     fetchReviews();
+    fetchNewsEvents();
+    fetchGallery();
+    fetchAboutUs();
   }, []);
 
   const fetchHomePage = async () => {
@@ -96,6 +139,52 @@ export default function Home() {
     }
   };
 
+  const fetchNewsEvents = async () => {
+    try {
+      const response = await fetch("/api/homepage-news");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.newsEvents) {
+          setNewsEvents(data.newsEvents);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching news events:", error);
+    } finally {
+      setLoadingNews(false);
+    }
+  };
+
+  const fetchGallery = async () => {
+    try {
+      const response = await fetch("/api/homepage-gallery");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.images) {
+          setGalleryImages(data.images);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching gallery:", error);
+    } finally {
+      setLoadingGallery(false);
+    }
+  };
+
+  const fetchAboutUs = async () => {
+    try {
+      const response = await fetch("/api/about-us");
+      if (response.ok) {
+        const data = await response.json();
+        setAboutUsData(data);
+      }
+    } catch (error) {
+      console.error("Error fetching about us:", error);
+    } finally {
+      setLoadingAboutUs(false);
+    }
+  };
+
   const getIcon = (iconName: string) => {
     const Icon = (Icons as any)[iconName];
     return Icon || BookOpen;
@@ -120,6 +209,118 @@ export default function Home() {
   return (
     <div>
       <Header />
+
+      {/* About Us Section */}
+      <section className="container mx-auto px-4 py-16 sm:py-20">
+        {loadingAboutUs ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
+          </div>
+        ) : aboutUsData ? (
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Left Content */}
+            <div className="space-y-6">
+              <Badge className="bg-cyan-100 text-cyan-700 border-cyan-300">
+                <GraduationCap className="w-3 h-3 mr-1" />
+                About Our Institution
+              </Badge>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
+                {aboutUsData.title}
+              </h2>
+              <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+                {aboutUsData.description}
+              </p>
+              {aboutUsData.subtitle && (
+                <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+                  {aboutUsData.subtitle}
+                </p>
+              )}
+              
+              {/* Key Highlights */}
+              {aboutUsData.features && aboutUsData.features.length > 0 && (
+                <div className="grid sm:grid-cols-2 gap-4 pt-4">
+                  {aboutUsData.features.slice(0, 4).map((feature, index) => {
+                    const colors = [
+                      { bg: 'bg-green-100', icon: 'text-green-600' },
+                      { bg: 'bg-blue-100', icon: 'text-blue-600' },
+                      { bg: 'bg-purple-100', icon: 'text-purple-600' },
+                      { bg: 'bg-amber-100', icon: 'text-amber-600' },
+                    ];
+                    const color = colors[index % colors.length];
+                    
+                    return (
+                      <div key={index} className="flex items-start gap-3">
+                        <div className={`w-10 h-10 ${color.bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <CheckCircle className={`w-5 h-5 ${color.icon}`} />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-slate-900 mb-1">{feature}</h4>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Link href="/about">
+                  <Button className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-6 text-base">
+                    Learn More About Us
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+                <Link href="/admission">
+                  <Button variant="outline" className="border-2 border-cyan-600 text-cyan-600 hover:bg-cyan-50 px-6 py-6 text-base">
+                    Apply for Admission
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Image/Visual */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-3xl transform rotate-3"></div>
+              <div className="relative bg-white rounded-3xl shadow-2xl p-8 space-y-6">
+                {/* Core Values */}
+                {aboutUsData.coreValues && aboutUsData.coreValues.length > 0 && aboutUsData.coreValues.slice(0, 3).map((value, index) => {
+                  const gradients = [
+                    'bg-gradient-to-br from-cyan-500 to-blue-600',
+                    'bg-gradient-to-br from-purple-500 to-pink-600',
+                    'bg-gradient-to-br from-green-500 to-emerald-600',
+                  ];
+                  const gradient = gradients[index % gradients.length];
+                  
+                  // Get icon component from lucide-react
+                  const IconComponent = (Icons as any)[value.icon] || Target;
+                  
+                  return (
+                    <div key={index} className="flex items-start gap-4">
+                      <div className={`w-12 h-12 ${gradient} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                        <IconComponent className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-bold text-slate-900 mb-2">{value.title}</h4>
+                        <p className="text-sm text-slate-600">
+                          {value.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-10 text-slate-600">
+            <p>No About Us content available.</p>
+          </div>
+        )}
+      </section>
+
+      {/* Divider */}
+      <div className="container mx-auto px-4">
+        <Separator className="bg-gradient-to-r from-transparent via-cyan-200 to-transparent" />
+      </div>
 
       {/* Why Choose Us Section */}
       <section className="container mx-auto px-4 py-20">
@@ -404,6 +605,205 @@ export default function Home() {
               </div>
             </>
           ) : null}
+        </div>
+      </section>
+
+      {/* Latest News & Events Section */}
+      <section className="container mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center space-y-4 mb-12">
+          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+            <Newspaper className="w-3 h-3 mr-1" />
+            Latest Updates
+          </Badge>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900">
+            News & Events
+          </h2>
+          <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+            Stay updated with our latest activities, achievements, and upcoming events
+          </p>
+        </div>
+
+        {loadingNews ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
+          </div>
+        ) : newsEvents.length > 0 ? (
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {newsEvents.map((news) => {
+              const getCategoryStyle = (category: string) => {
+                const styles: Record<string, { bg: string; text: string }> = {
+                  news: { bg: "bg-blue-100", text: "text-blue-700" },
+                  event: { bg: "bg-purple-100", text: "text-purple-700" },
+                  achievement: { bg: "bg-amber-100", text: "text-amber-700" },
+                  announcement: { bg: "bg-rose-100", text: "text-rose-700" },
+                };
+                return styles[category.toLowerCase()] || styles.news;
+              };
+              
+              const categoryStyle = getCategoryStyle(news.category);
+
+              return (
+                <Link key={news._id} href={`/news-events/${news.slug}`} className="block">
+                  <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden group h-full">
+                    <div className="relative h-48 bg-slate-200 overflow-hidden">
+                      <img
+                        src={news.imageUrl}
+                        alt={news.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+                      <Badge className={`absolute top-4 right-4 ${categoryStyle.bg} ${categoryStyle.text} border-0`}>
+                        {news.category.charAt(0).toUpperCase() + news.category.slice(1)}
+                      </Badge>
+                    </div>
+
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                        <Calendar className="w-3 h-3" />
+                        <span>
+                          {new Date(news.date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </span>
+                        {news.time && (
+                          <>
+                            <span>•</span>
+                            <Clock className="w-3 h-3" />
+                            <span>{news.time}</span>
+                          </>
+                        )}
+                      </div>
+                      <CardTitle className="text-xl font-bold text-slate-900 line-clamp-2 group-hover:text-cyan-600 transition-colors">
+                        {news.title}
+                      </CardTitle>
+                    </CardHeader>
+
+                    <CardContent>
+                      <p className="text-sm text-slate-600 mb-4 line-clamp-3">
+                        {news.excerpt}
+                      </p>
+
+                      {news.tags && news.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {news.tags.slice(0, 3).map((tag, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs bg-slate-50">
+                              {tag}
+                            </Badge>
+                          ))}
+                          {news.tags.length > 3 && (
+                            <Badge variant="outline" className="text-xs bg-slate-50">
+                              +{news.tags.length - 3}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between pt-3 border-t">
+                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <Users className="w-3 h-3" />
+                          <span>{news.author}</span>
+                        </div>
+                        <Button variant="link" className="text-cyan-600 hover:text-cyan-700 p-0 h-auto">
+                          Read More →
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Newspaper className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+            <p className="text-slate-500">No news events available at the moment</p>
+          </div>
+        )}
+
+        <div className="text-center">
+          <Link href="/news-events">
+            <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white px-8 py-6 text-base">
+              View All News & Events
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section className="bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50 py-16 sm:py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center space-y-4 mb-12">
+            <Badge className="bg-purple-100 text-purple-700 border-purple-300">
+              <Trophy className="w-3 h-3 mr-1" />
+              Our Gallery
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900">
+              Moments & Memories
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+              Explore the vibrant life at Darul Hikmah Academy through our photo gallery
+            </p>
+          </div>
+
+          {loadingGallery ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+            </div>
+          ) : galleryImages.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {galleryImages.map((image) => (
+                  <Card
+                    key={image._id}
+                    className="overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 border-none shadow-lg"
+                  >
+                    <div className="relative h-64">
+                      <img
+                        src={image.imageUrl}
+                        alt={image.title}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute top-2 right-2">
+                        <Badge className="bg-white/90 text-gray-800">
+                          {image.category}
+                        </Badge>
+                      </div>
+                    </div>
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-lg mb-2 text-slate-900">
+                        {image.title}
+                      </h3>
+                      <div className="flex items-center text-sm text-gray-600 mb-2">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        {new Date(image.date).toLocaleDateString()}
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <MapPin className="w-4 h-4 mr-2" />
+                        {image.location}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              
+              <div className="text-center">
+                <Link href="/gallery">
+                  <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-base">
+                    View Full Gallery
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <Trophy className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-500">Gallery images coming soon</p>
+            </div>
+          )}
         </div>
       </section>
     </div>
