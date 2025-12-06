@@ -15,12 +15,6 @@ export interface IFooterSettings extends Document {
     email: string;
     officeHours: string;
   };
-  // Bottom Bar Links
-  bottomLinks: {
-    privacyPolicy: string;
-    termsOfService: string;
-    sitemap: string;
-  };
   // Copyright text
   copyrightText: string;
   // Map embed URL
@@ -47,11 +41,6 @@ const FooterSettingsSchema = new Schema<IFooterSettings>(
         type: String,
         default: "Sunday - Thursday: 8:00 AM - 5:00 PM",
       },
-    },
-    bottomLinks: {
-      privacyPolicy: { type: String, default: "/privacy" },
-      termsOfService: { type: String, default: "/terms" },
-      sitemap: { type: String, default: "/sitemap" },
     },
     copyrightText: {
       type: String,

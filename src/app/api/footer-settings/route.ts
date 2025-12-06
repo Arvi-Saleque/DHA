@@ -23,11 +23,6 @@ export async function GET() {
           email: "info@madrasa.edu",
           officeHours: "Sunday - Thursday: 8:00 AM - 5:00 PM",
         },
-        bottomLinks: {
-          privacyPolicy: "/privacy",
-          termsOfService: "/terms",
-          sitemap: "/sitemap",
-        },
         copyrightText: "All rights reserved.",
         mapEmbedUrl:
           "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.9064863474833!2d90.39166931543427!3d23.750903394653474!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b8b087026b81%3A0x8fa563bbdd5904c2!2sDhaka%2C%20Bangladesh!5e0!3m2!1sen!2s!4v1633024800000!5m2!1sen!2s",
