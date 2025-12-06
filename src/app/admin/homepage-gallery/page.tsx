@@ -12,10 +12,12 @@ import Image from "next/image";
 interface GalleryImage {
   _id: string;
   title: string;
-  image: string;
+  imageUrl: string;
   category: string;
+  date: Date;
+  location: string;
+  description: string;
   order: number;
-  isActive: boolean;
 }
 
 export default function AdminHomepageGallery() {
@@ -304,11 +306,6 @@ export default function AdminHomepageGallery() {
                             <Tag className="w-3 h-3 mr-1" />
                             {img.category}
                           </Badge>
-                          {!img.isActive && (
-                            <Badge variant="outline" className="bg-red-100 text-red-700">
-                              Inactive
-                            </Badge>
-                          )}
                         </div>
                       </div>
                     </div>
