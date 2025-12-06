@@ -724,7 +724,7 @@ export default function Home() {
 
         <div className="text-center">
           <Link href="/news-events">
-            <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white px-8 py-6 text-base">
+            <Button className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-6 text-base">
               View All News & Events
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -791,7 +791,7 @@ export default function Home() {
               
               <div className="text-center">
                 <Link href="/gallery">
-                  <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-base">
+                  <Button className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-6 text-base">
                     View Full Gallery
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
