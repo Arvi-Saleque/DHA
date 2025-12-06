@@ -50,7 +50,12 @@ const menuItems: MenuItem[] = [
   {
     title: "Homepage",
     icon: <Home className="h-5 w-5" />,
-    href: "/admin/homepage",
+    submenu: [
+      { title: "Why Choose Us", href: "/admin/homepage", icon: <Home className="h-4 w-4" /> },
+      { title: "About Us Section", href: "/admin/homepage-about", icon: <Info className="h-4 w-4" /> },
+      { title: "News Selection", href: "/admin/homepage-news", icon: <Newspaper className="h-4 w-4" /> },
+      { title: "Gallery Selection", href: "/admin/homepage-gallery", icon: <ImageIcon className="h-4 w-4" /> },
+    ],
   },
   {
     title: "Header Slider",

@@ -188,23 +188,47 @@ export async function POST(request: Request) {
             });
             console.log(`✅ Email sent to ${subscriber.email}`, result);
             return { success: true, email: subscriber.email, result };
-          } catch (error) {
+          } catch (error: any) {
             console.error(`❌ Failed to send email to ${subscriber.email}:`, error);
-            return { success: false, email: subscriber.email, error };
+            
+            // Check if it's a validation error about domain verification
+            const isValidationError = error?.name === 'validation_error' || 
+                                     error?.message?.includes('verify a domain');
+            
+            return { 
+              success: false, 
+              email: subscriber.email, 
+              error: error?.message || String(error),
+              isValidationError 
+            };
           }
         });
 
         const results = await Promise.all(emailPromises);
         const successful = results.filter(r => r.success).length;
         const failed = results.filter(r => !r.success).length;
+        const hasValidationError = results.some(r => !r.success && (r as any).isValidationError);
         
         console.log(`✅ Successfully sent ${successful} email(s)`);
         if (failed > 0) {
           console.log(`❌ Failed to send ${failed} email(s)`);
         }
 
+        // If all failed due to validation error, return specific message
+        if (failed === subscribers.length && hasValidationError) {
+          return NextResponse.json({ 
+            success: false, 
+            message: 'Email domain not verified. Please verify your domain at resend.com/domains or add test recipients.',
+            error: 'Resend requires domain verification to send to external email addresses. Current from address: ' + fromEmail,
+            details: 'Visit https://resend.com/domains to verify your domain, or use test mode with your own email.',
+            subscribersCount: subscribers.length,
+            successful: 0,
+            failed,
+          }, { status: 403 });
+        }
+        
         return NextResponse.json({ 
-          success: true, 
+          success: successful > 0, 
           message: `Email notifications sent to ${successful} subscriber(s)${failed > 0 ? ` (${failed} failed)` : ''}`,
           subscribersCount: subscribers.length,
           successful,
