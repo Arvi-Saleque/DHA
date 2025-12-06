@@ -120,6 +120,11 @@ const menuItems: MenuItem[] = [
     icon: <Mail className="h-5 w-5" />,
     href: "/admin/newsletter",
   },
+  {
+    title: "Footer Settings",
+    icon: <Settings className="h-5 w-5" />,
+    href: "/admin/footer-settings",
+  },
 ];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {

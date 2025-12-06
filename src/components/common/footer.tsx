@@ -39,26 +39,73 @@ const footerLinks = {
   ],
 };
 
-// Social media links
-const socialLinks = [
-  { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
-  { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
-  { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
-  { icon: Youtube, href: "https://youtube.com", label: "YouTube" },
-];
-
-// Contact information
-const contactInfo = {
-  address: "123 Education Street, Dhaka, Bangladesh",
-  phone: "+880 1234-567890",
-  email: "info@madrasa.edu",
-  hours: "Sunday - Thursday: 8:00 AM - 5:00 PM",
-};
+interface FooterSettings {
+  socialMedia: {
+    facebook: string;
+    twitter: string;
+    instagram: string;
+    youtube: string;
+  };
+  contact: {
+    address: string;
+    phone: string;
+    email: string;
+    officeHours: string;
+  };
+  bottomLinks: {
+    privacyPolicy: string;
+    termsOfService: string;
+    sitemap: string;
+  };
+  copyrightText: string;
+  mapEmbedUrl: string;
+}
 
 export default function Footer() {
   const [email, setEmail] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [message, setMessage] = React.useState("");
+  const [footerSettings, setFooterSettings] = React.useState<FooterSettings | null>(null);
+
+  React.useEffect(() => {
+    fetchFooterSettings();
+  }, []);
+
+  const fetchFooterSettings = async () => {
+    try {
+      const response = await fetch("/api/footer-settings");
+      const result = await response.json();
+      if (result.success) {
+        setFooterSettings(result.data);
+      }
+    } catch (error) {
+      console.error("Error fetching footer settings:", error);
+    }
+  };
+
+  const socialLinks = footerSettings ? [
+    { icon: Facebook, href: footerSettings.socialMedia.facebook, label: "Facebook" },
+    { icon: Twitter, href: footerSettings.socialMedia.twitter, label: "Twitter" },
+    { icon: Instagram, href: footerSettings.socialMedia.instagram, label: "Instagram" },
+    { icon: Youtube, href: footerSettings.socialMedia.youtube, label: "YouTube" },
+  ] : [
+    { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
+    { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
+    { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
+    { icon: Youtube, href: "https://youtube.com", label: "YouTube" },
+  ];
+
+  const contactInfo = footerSettings ? {
+    address: footerSettings.contact.address,
+    phone: footerSettings.contact.phone,
+    email: footerSettings.contact.email,
+    hours: footerSettings.contact.officeHours,
+  } : {
+    address: "123 Education Street, Dhaka, Bangladesh",
+    phone: "+880 1234-567890",
+    email: "info@madrasa.edu",
+    hours: "Sunday - Thursday: 8:00 AM - 5:00 PM",
+  };
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -285,7 +332,7 @@ export default function Footer() {
             <div className="relative w-full h-48 sm:h-56 md:h-64 rounded-lg overflow-hidden border bg-muted">
               {/* Google Maps Embed - Replace with your actual location */}
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.9064863474833!2d90.39166931543427!3d23.750903394653474!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b8b087026b81%3A0x8fa563bbdd5904c2!2sDhaka%2C%20Bangladesh!5e0!3m2!1sen!2s!4v1633024800000!5m2!1sen!2s"
+                src={footerSettings?.mapEmbedUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.9064863474833!2d90.39166931543427!3d23.750903394653474!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b8b087026b81%3A0x8fa563bbdd5904c2!2sDhaka%2C%20Bangladesh!5e0!3m2!1sen!2s!4v1633024800000!5m2!1sen!2s"}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
@@ -309,25 +356,24 @@ export default function Footer() {
       <div className="border-t bg-muted/50">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground text-center md:text-left">
-              © {new Date().getFullYear()} Madrasa Management System. All rights
-              reserved.
+            <p className="text-sm text-center text-muted-foreground text-center md:text-left">
+              © {new Date().getFullYear()} {footerSettings?.copyrightText || "All rights reserved."}
             </p>
             <div className="flex gap-6">
               <Link
-                href="/privacy"
+                href={footerSettings?.bottomLinks.privacyPolicy || "/privacy"}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Privacy Policy
               </Link>
               <Link
-                href="/terms"
+                href={footerSettings?.bottomLinks.termsOfService || "/terms"}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Terms of Service
               </Link>
               <Link
-                href="/sitemap"
+                href={footerSettings?.bottomLinks.sitemap || "/sitemap"}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Sitemap
