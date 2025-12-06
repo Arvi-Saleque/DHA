@@ -22,7 +22,7 @@ const footerLinks = {
   quickLinks: [
     { title: "Home", href: "/" },
     { title: "About Us", href: "/about" },
-    { title: "Admissions", href: "/admissions" },
+    { title: "Admissions", href: "/admission" },
     { title: "Contact", href: "/contact" },
   ],
   academic: [
@@ -51,11 +51,6 @@ interface FooterSettings {
     phone: string;
     email: string;
     officeHours: string;
-  };
-  bottomLinks: {
-    privacyPolicy: string;
-    termsOfService: string;
-    sitemap: string;
   };
   copyrightText: string;
   mapEmbedUrl: string;
@@ -361,19 +356,19 @@ export default function Footer() {
             </p>
             <div className="flex gap-6">
               <Link
-                href={footerSettings?.bottomLinks.privacyPolicy || "/privacy"}
+                href="/privacy"
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Privacy Policy
               </Link>
               <Link
-                href={footerSettings?.bottomLinks.termsOfService || "/terms"}
+                href="/terms"
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Terms of Service
               </Link>
               <Link
-                href={footerSettings?.bottomLinks.sitemap || "/sitemap"}
+                href="/sitemap"
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Sitemap

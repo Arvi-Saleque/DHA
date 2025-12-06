@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import DashboardLayout from "@/components/admin/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,11 +22,6 @@ interface FooterSettings {
     email: string;
     officeHours: string;
   };
-  bottomLinks: {
-    privacyPolicy: string;
-    termsOfService: string;
-    sitemap: string;
-  };
   copyrightText: string;
   mapEmbedUrl: string;
 }
@@ -43,11 +39,6 @@ export default function FooterSettingsPage() {
       phone: "",
       email: "",
       officeHours: "",
-    },
-    bottomLinks: {
-      privacyPolicy: "",
-      termsOfService: "",
-      sitemap: "",
     },
     copyrightText: "",
     mapEmbedUrl: "",
@@ -112,8 +103,9 @@ export default function FooterSettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Footer Settings</h1>
           <p className="text-muted-foreground">
@@ -349,59 +341,12 @@ export default function FooterSettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Bottom Links */}
+      {/* Copyright Text */}
       <Card>
         <CardHeader>
-          <CardTitle>Bottom Footer Links</CardTitle>
+          <CardTitle>Copyright Text</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="privacyPolicy">Privacy Policy URL</Label>
-              <Input
-                id="privacyPolicy"
-                value={settings.bottomLinks.privacyPolicy}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    bottomLinks: { ...settings.bottomLinks, privacyPolicy: e.target.value },
-                  })
-                }
-                placeholder="/privacy"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="termsOfService">Terms of Service URL</Label>
-              <Input
-                id="termsOfService"
-                value={settings.bottomLinks.termsOfService}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    bottomLinks: { ...settings.bottomLinks, termsOfService: e.target.value },
-                  })
-                }
-                placeholder="/terms"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="sitemap">Sitemap URL</Label>
-              <Input
-                id="sitemap"
-                value={settings.bottomLinks.sitemap}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    bottomLinks: { ...settings.bottomLinks, sitemap: e.target.value },
-                  })
-                }
-                placeholder="/sitemap"
-              />
-            </div>
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="copyrightText">Copyright Text</Label>
             <Input
@@ -437,6 +382,7 @@ export default function FooterSettingsPage() {
           )}
         </Button>
       </div>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }
