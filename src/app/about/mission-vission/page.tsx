@@ -219,7 +219,12 @@ export default function MissionVisionPage() {
             </div>
             <CardContent className="p-8">
               <p className="text-lg text-slate-700 mb-6 leading-relaxed">
-                {data.missionDescription}
+                {data.missionDescription.split('\n').map((line, i) => (
+                  <span key={i}>
+                    {line}
+                    {i < data.missionDescription.split('\n').length - 1 && <br />}
+                  </span>
+                ))}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {data.missionPoints.map((point, index) => {
@@ -273,7 +278,12 @@ export default function MissionVisionPage() {
             </div>
             <CardContent className="p-8">
               <p className="text-lg text-slate-700 mb-6 leading-relaxed">
-                {data.visionDescription}
+                {data.visionDescription.split('\n').map((line, i) => (
+                  <span key={i}>
+                    {line}
+                    {i < data.visionDescription.split('\n').length - 1 && <br />}
+                  </span>
+                ))}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {data.visionPoints.map((point, index) => {

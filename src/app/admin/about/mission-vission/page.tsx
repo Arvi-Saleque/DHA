@@ -250,6 +250,9 @@ export default function MissionVisionAdmin() {
                   placeholder="Enter mission description..."
                   rows={4}
                 />
+                <p className="text-sm text-slate-500 mt-1">
+                  Use \n for line breaks (e.g., Bengali text\nEnglish text)
+                </p>
               </div>
 
               <div>
@@ -385,6 +388,9 @@ export default function MissionVisionAdmin() {
                   placeholder="Enter vision description..."
                   rows={4}
                 />
+                <p className="text-sm text-slate-500 mt-1">
+                  Use \n for line breaks (e.g., Bengali text\nEnglish text)
+                </p>
               </div>
 
               <div>
