@@ -228,7 +228,12 @@ export default function Home() {
                 {aboutUsData.title}
               </h2>
               <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
-                {aboutUsData.description}
+                {aboutUsData.description.split('\n').map((line, i) => (
+                  <span key={i}>
+                    {line}
+                    {i < aboutUsData.description.split('\n').length - 1 && <br />}
+                  </span>
+                ))}
               </p>
               {aboutUsData.subtitle && (
                 <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
