@@ -83,10 +83,10 @@ export async function PUT(request: NextRequest) {
     }
 
     return NextResponse.json(about);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating about us:', error);
     return NextResponse.json(
-      { error: 'Failed to update about us content' },
+      { error: 'Failed to update about us content', details: error.message },
       { status: 500 }
     );
   }

@@ -44,6 +44,7 @@ export default function AdminHomepageAboutUs() {
     coreValues: [],
   });
   const [hasExistingData, setHasExistingData] = useState(false);
+  const [existingId, setExistingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAboutUs();
@@ -64,6 +65,7 @@ export default function AdminHomepageAboutUs() {
             features: data.features || [],
             coreValues: data.coreValues || [],
           });
+          setExistingId(data._id);
           setHasExistingData(true);
         }
       }
@@ -91,10 +93,14 @@ export default function AdminHomepageAboutUs() {
       }
 
       const method = hasExistingData ? "PUT" : "POST";
+      const payload = hasExistingData 
+        ? { ...aboutUsData, id: existingId }
+        : aboutUsData;
+      
       const response = await fetch("/api/about-us", {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(aboutUsData),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -103,7 +109,7 @@ export default function AdminHomepageAboutUs() {
         fetchAboutUs();
       } else {
         const error = await response.json();
-        throw new Error(error.message || "Failed to update");
+        throw new Error(error.error || error.details || "Failed to update");
       }
     } catch (error) {
       console.error("Error saving about us:", error);
@@ -231,6 +237,9 @@ export default function AdminHomepageAboutUs() {
                 placeholder="Main description about your institution"
                 rows={5}
               />
+              <p className="text-sm text-slate-500 mt-1">
+                Use \n for line breaks (e.g., Bengali text\nEnglish text)
+              </p>
             </div>
 
             <div>
