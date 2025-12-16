@@ -174,7 +174,7 @@ export default function TeachersPage() {
         <Tabs defaultValue="All" className="max-w-7xl mx-auto mb-8" onValueChange={(value) => setActiveCategory(value)}>
           <TabsList className={`grid w-full gap-2 bg-slate-100 p-2 rounded-xl mb-8`} style={{ gridTemplateColumns: `repeat(${Math.min(activeCategories.length + 1, 5)}, minmax(0, 1fr))` }}>
             <TabsTrigger value="All" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
-              All Teachers
+              All
             </TabsTrigger>
             {activeCategories.map((cat) => (
               <TabsTrigger 
