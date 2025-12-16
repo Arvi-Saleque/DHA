@@ -52,7 +52,6 @@ interface VisionPoint {
 
 interface CoreValue {
   name: string;
-  icon: string;
   color: string;
 }
 
@@ -543,27 +542,6 @@ export default function MissionVisionAdmin() {
                           }
                           placeholder="e.g., Faith"
                         />
-                      </div>
-
-                      <div>
-                        <Label>Icon</Label>
-                        <Select
-                          value={value.icon}
-                          onValueChange={(val) =>
-                            updateCoreValue(index, "icon", val)
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {availableIcons.map((icon) => (
-                              <SelectItem key={icon} value={icon}>
-                                {icon}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
                       </div>
 
                       <div>
