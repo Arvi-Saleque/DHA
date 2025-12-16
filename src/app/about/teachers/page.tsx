@@ -176,7 +176,7 @@ export default function TeachersPage() {
             <TabsTrigger value="All" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
               All
             </TabsTrigger>
-            {activeCategories.map((cat) => (
+            {activeCategories.filter(cat => cat.name !== "All").map((cat) => (
               <TabsTrigger 
                 key={cat.name} 
                 value={cat.name} 
