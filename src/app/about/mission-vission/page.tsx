@@ -87,7 +87,6 @@ interface VisionPoint {
 
 interface CoreValue {
   name: string;
-  icon: string;
   color: string;
 }
 
@@ -146,12 +145,12 @@ export default function MissionVisionPage() {
       { icon: "Heart", title: "Interfaith Dialogue", description: "Fostering understanding and harmony" },
     ],
     coreValues: [
-      { name: "Faith", icon: "Heart", color: "bg-cyan-500" },
-      { name: "Excellence", icon: "Award", color: "bg-blue-500" },
-      { name: "Integrity", icon: "Shield", color: "bg-purple-500" },
-      { name: "Compassion", icon: "Heart", color: "bg-pink-500" },
-      { name: "Knowledge", icon: "BookOpen", color: "bg-indigo-500" },
-      { name: "Service", icon: "Users", color: "bg-teal-500" },
+      { name: "Faith", color: "bg-cyan-500" },
+      { name: "Excellence", color: "bg-blue-500" },
+      { name: "Integrity", color: "bg-purple-500" },
+      { name: "Compassion", color: "bg-pink-500" },
+      { name: "Knowledge", color: "bg-indigo-500" },
+      { name: "Service", color: "bg-teal-500" },
     ],
   };
 
@@ -332,26 +331,23 @@ export default function MissionVisionPage() {
 
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {data.coreValues.map((value, index) => {
-                const IconComponent = getIconComponent(value.icon || 'CheckCircle');
-                return (
-                  <Card
-                    key={index}
-                    className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer group"
-                  >
-                    <CardContent className="p-6 text-center">
-                      <div
-                        className={`w-16 h-16 ${value.color} rounded-2xl mx-auto mb-3 flex items-center justify-center group-hover:scale-110 transition-transform`}
-                      >
-                        <IconComponent className="w-8 h-8 text-white" />
-                      </div>
-                      <h3 className="text-lg font-bold text-slate-900">
-                        {value.name}
-                      </h3>
-                    </CardContent>
+              {data.coreValues.map((value, index) => (
+                <Card
+                  key={index}
+                  className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer group"
+                >
+                  <CardContent className="p-6 text-center">
+                    <div
+                      className={`w-16 h-16 ${value.color} rounded-2xl mx-auto mb-3 flex items-center justify-center group-hover:scale-110 transition-transform`}
+                    >
+                      <CheckCircle2 className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900">
+                      {value.name}
+                    </h3>
+                  </CardContent>
                 </Card>
-                );
-              })}
+              ))}
             </div>
           </div>
         </div>
