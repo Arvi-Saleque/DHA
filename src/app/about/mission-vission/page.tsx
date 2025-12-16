@@ -87,6 +87,7 @@ interface VisionPoint {
 
 interface CoreValue {
   name: string;
+  icon: string;
   color: string;
 }
 
@@ -331,23 +332,26 @@ export default function MissionVisionPage() {
 
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {data.coreValues.map((value, index) => (
-                <Card
-                  key={index}
-                  className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer group"
-                >
-                  <CardContent className="p-6 text-center">
-                    <div
-                      className={`w-16 h-16 ${value.color} rounded-2xl mx-auto mb-3 flex items-center justify-center group-hover:scale-110 transition-transform`}
-                    >
-                      <CheckCircle2 className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900">
-                      {value.name}
-                    </h3>
-                  </CardContent>
+              {data.coreValues.map((value, index) => {
+                const IconComponent = getIconComponent(value.icon || 'CheckCircle');
+                return (
+                  <Card
+                    key={index}
+                    className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer group"
+                  >
+                    <CardContent className="p-6 text-center">
+                      <div
+                        className={`w-16 h-16 ${value.color} rounded-2xl mx-auto mb-3 flex items-center justify-center group-hover:scale-110 transition-transform`}
+                      >
+                        <IconComponent className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900">
+                        {value.name}
+                      </h3>
+                    </CardContent>
                 </Card>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
