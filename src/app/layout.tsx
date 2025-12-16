@@ -1,6 +1,6 @@
 "use client";
 
-import type { Metadata } from "next";
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/common/navbar";
@@ -39,6 +39,7 @@ export default function RootLayout({
             <Footer />
           </>
         )}
+        <GoogleAnalytics gaId="G-E7772SZ5HK" />
       </body>
     </html>
   );
