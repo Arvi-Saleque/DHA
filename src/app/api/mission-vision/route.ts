@@ -6,7 +6,15 @@ import MissionVision from '@/models/MissionVision';
 export async function GET() {
   try {
     await connectDB();
-    const missionVision = await MissionVision.findOne({ isActive: true }).sort({ createdAt: -1 });
+    let missionVision = await MissionVision.findOne({ isActive: true }).sort({ createdAt: -1 });
+
+    // Ensure coreValues have icon field for backward compatibility
+    if (missionVision && missionVision.coreValues) {
+      missionVision.coreValues = missionVision.coreValues.map((value: any) => ({
+        ...value.toObject(),
+        icon: value.icon || 'CheckCircle'
+      }));
+    }
 
     return NextResponse.json({
       success: true,
