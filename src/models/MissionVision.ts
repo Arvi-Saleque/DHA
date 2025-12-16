@@ -38,6 +38,11 @@ const coreValueSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  icon: {
+    type: String,
+    required: false,
+    default: 'CheckCircle',
+  },
   color: {
     type: String,
     required: false,
