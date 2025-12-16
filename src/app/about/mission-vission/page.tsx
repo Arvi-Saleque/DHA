@@ -146,12 +146,12 @@ export default function MissionVisionPage() {
       { icon: "Heart", title: "Interfaith Dialogue", description: "Fostering understanding and harmony" },
     ],
     coreValues: [
-      { name: "Faith", color: "bg-cyan-500" },
-      { name: "Excellence", color: "bg-blue-500" },
-      { name: "Integrity", color: "bg-purple-500" },
-      { name: "Compassion", color: "bg-pink-500" },
-      { name: "Knowledge", color: "bg-indigo-500" },
-      { name: "Service", color: "bg-teal-500" },
+      { name: "Faith", icon: "Heart", color: "bg-cyan-500" },
+      { name: "Excellence", icon: "Award", color: "bg-blue-500" },
+      { name: "Integrity", icon: "Shield", color: "bg-purple-500" },
+      { name: "Compassion", icon: "Heart", color: "bg-pink-500" },
+      { name: "Knowledge", icon: "BookOpen", color: "bg-indigo-500" },
+      { name: "Service", icon: "Users", color: "bg-teal-500" },
     ],
   };
 
