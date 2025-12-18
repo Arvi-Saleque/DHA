@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/common/navbar";
 import Footer from "@/components/common/footer";
+import LoadingScreen from "@/components/common/loading-screen";
 import { usePathname } from "next/navigation";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <LoadingScreen />
         {isAdminRoute ? (
           children
         ) : (
