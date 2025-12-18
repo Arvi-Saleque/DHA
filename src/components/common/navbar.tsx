@@ -109,8 +109,8 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo Section */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <BookOpen className="h-5 w-5 sm:h-6 sm:w-6" />
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center">
+              <img src="/images/logo.png" alt="Madrasa Logo" className="h-full w-full object-contain" />
             </div>
             <div className="flex flex-col">
               <span className="text-base sm:text-lg font-bold leading-tight">Madrasa</span>
