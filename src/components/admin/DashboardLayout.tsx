@@ -160,8 +160,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <div className="h-10 w-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <GraduationCap className="h-6 w-6 text-white" />
+            <div className="h-10 w-10 flex items-center justify-center">
+              <img src="/images/logo.png" alt="Madrasa Logo" className="h-full w-full object-contain" />
             </div>
             <span className="font-bold text-lg">DHA Admin</span>
           </div>

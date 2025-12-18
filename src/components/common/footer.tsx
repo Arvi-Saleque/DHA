@@ -144,8 +144,8 @@ export default function Footer() {
           {/* Logo and About Section - Takes 4 columns */}
           <div className="lg:col-span-4">
             <Link href="/" className="flex items-center space-x-2 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <BookOpen className="h-6 w-6" />
+              <div className="flex h-10 w-10 items-center justify-center">
+                <img src="/images/logo.png" alt="Madrasa Logo" className="h-full w-full object-contain" />
               </div>
               <div className="flex flex-col">
                 <span className="text-lg font-bold leading-tight">Madrasa</span>
