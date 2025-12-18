@@ -29,8 +29,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/images/logo.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/images/logo.png" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/images/android-chrome-192x192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/images/android-chrome-512x512.png" />
+        <meta name="theme-color" content="#0891b2" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

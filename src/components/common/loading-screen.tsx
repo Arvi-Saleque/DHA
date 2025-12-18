@@ -43,10 +43,10 @@ export default function LoadingScreen() {
 
         {/* Text */}
         <div className="text-center space-y-2">
+          <p className="text-sm text-gray-500 animate-pulse">Welcome to</p>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
-            Madrasa Management
+            Darul Hikmah Academy...
           </h2>
-          <p className="text-sm text-gray-500 animate-pulse">Loading your experience...</p>
         </div>
 
         {/* Loading dots */}
