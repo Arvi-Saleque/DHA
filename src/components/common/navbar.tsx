@@ -110,7 +110,11 @@ export default function Navbar() {
           {/* Logo Section */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center">
-              <img src="/images/logo.png" alt="Madrasa Logo" className="h-full w-full object-contain" />
+              <img src="/images/logo.png" alt="Darul Hikmah Academy Logo" className="h-full w-full object-contain" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-base sm:text-lg font-bold leading-tight">Darul Hikmah</span>
+              <span className="text-xs text-muted-foreground">Academy</span>
             </div>
           </Link>
 
