@@ -147,12 +147,6 @@ export default function Footer() {
               <div className="flex h-10 w-10 items-center justify-center">
                 <img src="/images/logo.png" alt="Madrasa Logo" className="h-full w-full object-contain" />
               </div>
-              <div className="flex flex-col">
-                <span className="text-lg font-bold leading-tight">Madrasa</span>
-                <span className="text-xs text-muted-foreground">
-                  Management
-                </span>
-              </div>
             </Link>
             <p className="text-sm text-muted-foreground mb-4 max-w-sm">
               Dedicated to providing quality Islamic education combined with

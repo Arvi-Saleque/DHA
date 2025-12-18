@@ -112,10 +112,6 @@ export default function Navbar() {
             <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center">
               <img src="/images/logo.png" alt="Madrasa Logo" className="h-full w-full object-contain" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-base sm:text-lg font-bold leading-tight">Madrasa</span>
-              <span className="text-xs text-muted-foreground hidden sm:inline">Management</span>
-            </div>
           </Link>
 
           {/* Desktop Menu */}
