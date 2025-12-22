@@ -116,7 +116,15 @@ export async function DELETE(request: Request) {
     await connectDB();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
+    const deleteAll = searchParams.get("deleteAll");
     
+    // Delete all reviews
+    if (deleteAll === "true") {
+      await Review.deleteMany({});
+      return NextResponse.json({ message: "All reviews deleted successfully" });
+    }
+    
+    // Delete single review
     if (!id) {
       return NextResponse.json({ message: "Review ID is required" }, { status: 400 });
     }
