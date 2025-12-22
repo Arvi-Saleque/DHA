@@ -56,10 +56,14 @@ export default function ImageUploader({
       if (data.success) {
         onChange(data.url);
       } else {
-        setError(data.error || "Upload failed");
+        // Show detailed error message from server
+        const errorMessage = data.message || data.error || "Upload failed";
+        setError(errorMessage);
+        console.error("Upload failed:", data);
       }
-    } catch (error) {
-      setError("Upload failed. Please try again.");
+    } catch (error: any) {
+      const errorMessage = error?.message || "Upload failed. Please try again.";
+      setError(errorMessage);
       console.error("Upload error:", error);
     } finally {
       setUploading(false);
