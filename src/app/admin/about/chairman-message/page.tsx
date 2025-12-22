@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Trash2, Save, User, MessageCircle, Award, Quote } from "lucide-react";
+import ImageUploader from "@/components/common/ImageUploader";
 
 // Available icons for core values
 const availableIcons = [
@@ -245,29 +246,24 @@ export default function ChairmanMessageAdmin() {
               </div>
 
               <div>
-                <Label htmlFor="chairmanImageUrl">Chairman Photo URL *</Label>
-                <Input
-                  id="chairmanImageUrl"
+                <ImageUploader
+                  label="Chairman Photo"
                   value={formData.chairmanImageUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, chairmanImageUrl: e.target.value })
+                  onChange={(url) =>
+                    setFormData({ ...formData, chairmanImageUrl: url })
                   }
-                  placeholder="Use Unsplash URL or make Google Drive file public"
+                  folder="chairman"
                 />
-                <p className="text-sm text-slate-500 mt-1">
-                  For Google Drive: Share → Anyone with the link → Copy link
-                </p>
               </div>
 
               <div>
-                <Label htmlFor="signatureImageUrl">Signature Image URL (Optional)</Label>
-                <Input
-                  id="signatureImageUrl"
+                <ImageUploader
+                  label="Signature Image (Optional)"
                   value={formData.signatureImageUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, signatureImageUrl: e.target.value })
+                  onChange={(url) =>
+                    setFormData({ ...formData, signatureImageUrl: url })
                   }
-                  placeholder="Signature image URL"
+                  folder="chairman"
                 />
               </div>
             </CardContent>

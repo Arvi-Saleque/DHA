@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Plus, Save, Edit, X, Calendar, MapPin, Image as ImageIcon } from "lucide-react";
+import ImageUploader from "@/components/common/ImageUploader";
 
 interface GalleryImage {
   _id?: string;
@@ -250,13 +251,13 @@ export default function GalleryAdminPage() {
               </div>
 
               <div className="col-span-2">
-                <Label>Image URL (Google Drive or Direct Link) *</Label>
-                <Input
+                <ImageUploader
+                  label="Gallery Image *"
                   value={editingItem?.imageUrl || ""}
-                  onChange={(e) =>
-                    setEditingItem({ ...editingItem!, imageUrl: e.target.value })
+                  onChange={(url) =>
+                    setEditingItem({ ...editingItem!, imageUrl: url })
                   }
-                  placeholder="Image URL"
+                  folder="gallery"
                 />
               </div>
 

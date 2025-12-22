@@ -38,6 +38,7 @@ import {
   Mail,
   Phone,
 } from "lucide-react";
+import ImageUploader from "@/components/common/ImageUploader";
 
 const availableIcons = [
   { name: "Shield", component: Shield },
@@ -546,13 +547,13 @@ export default function CommitteeAdminPage() {
                         </Select>
                       </div>
                       <div className="col-span-2">
-                        <Label>Image URL (Google Drive or Unsplash)</Label>
-                        <Input
+                        <ImageUploader
+                          label="Member Photo"
                           value={member.imageUrl}
-                          onChange={(e) =>
-                            updateMember(index, "imageUrl", e.target.value)
+                          onChange={(url) =>
+                            updateMember(index, "imageUrl", url)
                           }
-                          placeholder="Image URL"
+                          folder="committee"
                         />
                       </div>
                       <div className="col-span-2">

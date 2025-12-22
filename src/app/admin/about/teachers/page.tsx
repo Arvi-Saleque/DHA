@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Trash2, Save, GraduationCap, Users, Quote, ArrowUp, ArrowDown } from "lucide-react";
+import ImageUploader from "@/components/common/ImageUploader";
 
 interface Category {
   name: string;
@@ -458,15 +459,12 @@ export default function FacultyAdmin() {
                       </div>
 
                       <div className="md:col-span-2">
-                        <Label>Image URL *</Label>
-                        <Input
+                        <ImageUploader
+                          label="Teacher Photo"
                           value={teacher.imageUrl}
-                          onChange={(e) => updateTeacher(tIndex, "imageUrl", e.target.value)}
-                          placeholder="Use Unsplash URL or make Google Drive file public"
+                          onChange={(url) => updateTeacher(tIndex, "imageUrl", url)}
+                          folder="teachers"
                         />
-                        <p className="text-sm text-slate-500 mt-1">
-                          For Google Drive: Share → Anyone with the link → Copy link
-                        </p>
                       </div>
 
                       <div>

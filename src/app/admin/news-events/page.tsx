@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Plus, Save, Edit, X, Calendar, Eye } from "lucide-react";
+import ImageUploader from "@/components/common/ImageUploader";
 
 interface NewsEvent {
   _id?: string;
@@ -303,13 +304,13 @@ export default function NewsEventsAdminPage() {
               </div>
 
               <div className="col-span-2">
-                <Label>Image URL (Google Drive or Direct Link) *</Label>
-                <Input
+                <ImageUploader
+                  label="News/Event Image"
                   value={editingItem?.imageUrl || ""}
-                  onChange={(e) =>
-                    setEditingItem({ ...editingItem!, imageUrl: e.target.value })
+                  onChange={(url) =>
+                    setEditingItem({ ...editingItem!, imageUrl: url })
                   }
-                  placeholder="Image URL"
+                  folder="news-events"
                 />
               </div>
 

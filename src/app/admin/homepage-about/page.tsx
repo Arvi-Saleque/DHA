@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Save, Eye } from "lucide-react";
+import ImageUploader from "@/components/common/ImageUploader";
 
 interface CoreValue {
   icon: string;
@@ -243,11 +244,12 @@ export default function AdminHomepageAboutUs() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Image URL</label>
-              <Input
+              <ImageUploader
+                label="About Us Image"
                 value={aboutUsData.imageUrl}
-                onChange={(e) => setAboutUsData({ ...aboutUsData, imageUrl: e.target.value })}
-                placeholder="https://example.com/image.jpg"
+                onChange={(url) => setAboutUsData({ ...aboutUsData, imageUrl: url })}
+                folder="homepage-about"
+              />
               />
             </div>
 
