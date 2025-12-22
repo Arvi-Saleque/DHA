@@ -250,7 +250,6 @@ export default function AdminHomepageAboutUs() {
                 onChange={(url) => setAboutUsData({ ...aboutUsData, imageUrl: url })}
                 folder="homepage-about"
               />
-              />
             </div>
 
             <div>
