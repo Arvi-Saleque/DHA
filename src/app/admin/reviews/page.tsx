@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { GripVertical, Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import ImageUploader from "@/components/common/ImageUploader";
 
 interface Review {
   _id?: string;
@@ -85,6 +86,25 @@ export default function AdminReviewsPage() {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (!confirm("Are you sure you want to delete ALL reviews? This action cannot be undone!")) return;
+    if (!confirm("This will permanently delete all reviews. Are you absolutely sure?")) return;
+
+    try {
+      const response = await fetch("/api/reviews?deleteAll=true", {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        fetchReviews();
+        alert("All reviews deleted successfully!");
+      }
+    } catch (error) {
+      console.error("Error deleting all reviews:", error);
+      alert("Failed to delete all reviews");
+    }
+  };
+
   const openAddModal = () => {
     setEditingReview({
       name: "",
@@ -121,10 +141,20 @@ export default function AdminReviewsPage() {
           <h1 className="text-3xl font-bold">Reviews Management</h1>
           <p className="text-gray-600 mt-1">Manage parent and guardian testimonials</p>
         </div>
-        <Button onClick={openAddModal} className="bg-cyan-600 hover:bg-cyan-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Review
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleDeleteAll} 
+            variant="destructive"
+            disabled={reviews.length === 0}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete All
+          </Button>
+          <Button onClick={openAddModal} className="bg-cyan-600 hover:bg-cyan-700">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Review
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
@@ -214,21 +244,12 @@ export default function AdminReviewsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Image URL *</label>
-                <Input
+                <ImageUploader
+                  label="Reviewer Image *"
                   value={editingReview.image}
-                  onChange={(e) =>
-                    setEditingReview({ ...editingReview, image: e.target.value })
-                  }
-                  placeholder="https://example.com/image.jpg"
+                  onChange={(url) => setEditingReview({ ...editingReview, image: url })}
+                  folder="reviews"
                 />
-                {editingReview.image && (
-                  <img
-                    src={editingReview.image}
-                    alt="Preview"
-                    className="w-20 h-20 rounded-full object-cover mt-2 border-2 border-gray-200"
-                  />
-                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
