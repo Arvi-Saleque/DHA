@@ -27,6 +27,7 @@ import {
   Trash2,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
+import ImageUploader from "@/components/common/ImageUploader";
 
 interface CoreValue {
   icon: string;
@@ -284,19 +285,14 @@ export default function AboutUsAdminPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="imageUrl">Image URL</Label>
-                        <Input
-                          id="imageUrl"
-                          placeholder="https://example.com/image.jpg"
+                        <ImageUploader
+                          label="About Us Image"
                           value={formData.imageUrl}
-                          onChange={(e) =>
-                            setFormData({ ...formData, imageUrl: e.target.value })
+                          onChange={(url) =>
+                            setFormData({ ...formData, imageUrl: url })
                           }
-                          required
+                          folder="about-us"
                         />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Use Unsplash URL or make Google Drive file <strong>public</strong> (Anyone with link can view)
-                        </p>
                       </div>
 
                       <div>

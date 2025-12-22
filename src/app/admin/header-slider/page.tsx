@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Save, Plus, Trash2, GripVertical, Image as ImageIcon } from "lucide-react";
+import ImageUploader from "@/components/common/ImageUploader";
 
 interface Slide {
   _id?: string;
@@ -235,18 +236,14 @@ export default function HeaderSliderAdminPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="image">Image URL (Google Drive or Direct URL)</Label>
-                <Input
-                  id="image"
+                <ImageUploader
+                  label="Slider Image"
                   value={editingSlide.image}
-                  onChange={(e) =>
-                    setEditingSlide({ ...editingSlide, image: e.target.value })
+                  onChange={(url) =>
+                    setEditingSlide({ ...editingSlide, image: url })
                   }
-                  placeholder="https://..."
+                  folder="header-slider"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  For Google Drive: Share → Copy link, then paste here
-                </p>
               </div>
 
               <div>

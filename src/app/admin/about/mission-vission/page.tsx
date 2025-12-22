@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Trash2, Save, Target, Eye, CheckCircle2 } from "lucide-react";
+import ImageUploader from "@/components/common/ImageUploader";
 
 // Available icons for mission and vision points
 const availableIcons = [
@@ -256,18 +257,14 @@ export default function MissionVisionAdmin() {
               </div>
 
               <div>
-                <Label htmlFor="missionImageUrl">Mission Image URL</Label>
-                <Input
-                  id="missionImageUrl"
+                <ImageUploader
+                  label="Mission Image"
                   value={formData.missionImageUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, missionImageUrl: e.target.value })
+                  onChange={(url) =>
+                    setFormData({ ...formData, missionImageUrl: url })
                   }
-                  placeholder="Use Unsplash URL or make Google Drive file public"
+                  folder="mission-vision"
                 />
-                <p className="text-sm text-slate-500 mt-1">
-                  For Google Drive: Share → Anyone with the link → Copy link
-                </p>
               </div>
 
               <div>
@@ -394,18 +391,14 @@ export default function MissionVisionAdmin() {
               </div>
 
               <div>
-                <Label htmlFor="visionImageUrl">Vision Image URL</Label>
-                <Input
-                  id="visionImageUrl"
+                <ImageUploader
+                  label="Vision Image"
                   value={formData.visionImageUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, visionImageUrl: e.target.value })
+                  onChange={(url) =>
+                    setFormData({ ...formData, visionImageUrl: url })
                   }
-                  placeholder="Use Unsplash URL or make Google Drive file public"
+                  folder="mission-vision"
                 />
-                <p className="text-sm text-slate-500 mt-1">
-                  For Google Drive: Share → Anyone with the link → Copy link
-                </p>
               </div>
 
               <div>

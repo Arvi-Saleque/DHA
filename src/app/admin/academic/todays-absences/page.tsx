@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Pencil, Trash2, Search, Image as ImageIcon, AlertTriangle } from "lucide-react";
+import ImageUploader from "@/components/common/ImageUploader";
 
 interface Absence {
   _id: string;
@@ -317,28 +318,14 @@ export default function TodaysAbsencesAdmin() {
               </div>
 
               <div>
-                <Label htmlFor="imageUrl">
-                  Google Drive Image URL <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="imageUrl"
-                  type="url"
+                <ImageUploader
+                  label="Absence Sheet Image"
                   value={formData.imageUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, imageUrl: e.target.value })
+                  onChange={(url) =>
+                    setFormData({ ...formData, imageUrl: url })
                   }
-                  placeholder="https://drive.google.com/file/d/FILE_ID/view..."
-                  required
+                  folder="absences"
                 />
-                <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                  <p className="text-xs text-blue-800 font-semibold mb-1">Important: Google Drive Setup</p>
-                  <ol className="text-xs text-blue-700 space-y-1 list-decimal list-inside">
-                    <li>Upload your image to Google Drive</li>
-                    <li>Right-click the file → Share → Change to "Anyone with the link"</li>
-                    <li>Set permission to "Viewer"</li>
-                    <li>Copy the sharing link and paste it here</li>
-                  </ol>
-                </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-4">

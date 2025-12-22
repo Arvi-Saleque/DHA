@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pencil, Trash2, Plus, Search } from 'lucide-react';
+import PdfUploader from '@/components/common/PdfUploader';
 
 interface ExamRoutine {
   _id: string;
@@ -174,23 +175,12 @@ export default function ExamRoutineManagement() {
               </div>
 
               <div>
-                <Label htmlFor="pdfUrl">Google Drive PDF URL</Label>
-                <Input
-                  id="pdfUrl"
+                <PdfUploader
+                  label="Exam Routine PDF"
                   value={formData.pdfUrl}
-                  onChange={(e) => setFormData({ ...formData, pdfUrl: e.target.value })}
-                  placeholder="https://drive.google.com/file/d/..."
-                  required
+                  onChange={(url) => setFormData({ ...formData, pdfUrl: url })}
+                  folder="exam-routines"
                 />
-                <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-800">
-                  <p className="font-semibold mb-1">Google Drive Setup:</p>
-                  <ol className="list-decimal ml-4 space-y-1">
-                    <li>Upload exam routine PDF to Google Drive</li>
-                    <li>Right-click → Share → Change to "Anyone with the link"</li>
-                    <li>Copy the link and paste here</li>
-                    <li>Link format: https://drive.google.com/file/d/FILE_ID/view</li>
-                  </ol>
-                </div>
               </div>
 
               <div className="flex justify-end gap-2">

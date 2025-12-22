@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import PdfUploader from "@/components/common/PdfUploader";
 import {
   Table,
   TableBody,
@@ -190,28 +191,14 @@ export default function AcademicCalendarManagement() {
                 </div>
 
                 <div>
-                  <Label htmlFor="pdfUrl">Google Drive PDF Link *</Label>
-                  <Input
-                    id="pdfUrl"
-                    placeholder="https://drive.google.com/file/d/YOUR_FILE_ID/view"
+                  <PdfUploader
+                    label="Academic Calendar PDF"
                     value={formData.pdfUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, pdfUrl: e.target.value })
+                    onChange={(url) =>
+                      setFormData({ ...formData, pdfUrl: url })
                     }
-                    required
+                    folder="academic-calendar"
                   />
-                  <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-xs text-blue-900 font-semibold mb-2 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      How to get Google Drive shareable link:
-                    </p>
-                    <ol className="text-xs text-blue-800 space-y-1 ml-4 list-decimal">
-                      <li>Upload your PDF file to Google Drive</li>
-                      <li>Right-click the file and select "Share"</li>
-                      <li>Change access to "Anyone with the link"</li>
-                      <li>Copy and paste the link here</li>
-                    </ol>
-                  </div>
                 </div>
 
                 <div className="flex gap-3 pt-4">
