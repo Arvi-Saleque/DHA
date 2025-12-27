@@ -182,30 +182,31 @@ export default function NewsEventsPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="container mx-auto px-4 -mt-12 sm:-mt-16 relative z-10 mb-6 sm:mb-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-          {stats.map((stat, index) => (
-            <Card
-              key={index}
-              className="border-none shadow-lg bg-white hover:shadow-xl transition-shadow"
-            >
-              <CardContent className="p-6 text-center">
-                <stat.icon className={`w-10 h-10 mx-auto mb-3 ${stat.color}`} />
-                <h3 className="text-3xl font-bold text-slate-900 mb-1">
-                  {stat.value}
-                </h3>
-                <p className="text-slate-600 text-sm">{stat.label}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
       {/* Filter Section */}
       <section className="container mx-auto px-4 mb-8">
         <Card className="border-none shadow-lg">
           <CardContent className="p-6">
+            {/* Stats Bar - Compact */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 pb-6 border-b">
+              {stats.map((stat, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
+                >
+                  <div className={`w-10 h-10 rounded-lg ${stat.color.replace('text-', 'bg-').replace('-600', '-100')} flex items-center justify-center flex-shrink-0`}>
+                    <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-2xl font-bold text-slate-900 leading-none mb-1">
+                      {stat.value}
+                    </p>
+                    <p className="text-xs text-slate-600 truncate">{stat.label}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Search and Filter */}
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />

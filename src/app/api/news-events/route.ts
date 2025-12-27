@@ -108,7 +108,17 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
+    const deleteAll = searchParams.get("deleteAll");
 
+    // Delete all news/events
+    if (deleteAll === "true") {
+      await NewsEvent.deleteMany({});
+      return NextResponse.json({
+        message: "All news/events deleted successfully",
+      });
+    }
+
+    // Delete single news/event
     if (!id) {
       return NextResponse.json(
         { message: "News/Event ID is required" },

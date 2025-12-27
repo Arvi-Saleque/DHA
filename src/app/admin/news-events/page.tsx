@@ -154,6 +154,30 @@ export default function NewsEventsAdminPage() {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (!confirm("Are you sure you want to delete ALL news/events? This action cannot be undone!")) return;
+    if (!confirm("This will permanently delete all news/events. Are you absolutely sure?")) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/news-events?deleteAll=true", {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setMessage("All news/events deleted successfully!");
+        fetchNewsEvents();
+      } else {
+        setMessage("Failed to delete all news/events");
+      }
+    } catch (error) {
+      setMessage("Failed to delete all news/events");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const addTag = () => {
     if (!editingItem || !tagInput.trim()) return;
     if (!editingItem.tags.includes(tagInput.trim())) {
@@ -193,18 +217,31 @@ export default function NewsEventsAdminPage() {
             Create and manage news articles, events, and announcements
           </p>
         </div>
-        {!isCreating && !editingItem && (
-          <Button
-            onClick={() => {
-              setIsCreating(true);
-              setEditingItem(emptyNewsEvent);
-            }}
-            size="lg"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add New
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {newsEvents.length > 0 && (
+            <Button
+              onClick={handleDeleteAll}
+              variant="destructive"
+              size="lg"
+              disabled={loading}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete All
+            </Button>
+          )}
+          {!isCreating && !editingItem && (
+            <Button
+              onClick={() => {
+                setIsCreating(true);
+                setEditingItem(emptyNewsEvent);
+              }}
+              size="lg"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add New
+            </Button>
+          )}
+        </div>
       </div>
 
       {message && (

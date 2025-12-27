@@ -156,18 +156,20 @@ export default function Footer() {
 
             {/* Social Media Links */}
             <div className="flex gap-2">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-background border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
-                >
-                  <social.icon className="h-4 w-4" />
-                </a>
-              ))}
+              {socialLinks
+                .filter((social) => social.href && social.href.trim() !== '')
+                .map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-background border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+                  >
+                    <social.icon className="h-4 w-4" />
+                  </a>
+                ))}
             </div>
           </div>
 
@@ -344,30 +346,10 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="border-t bg-muted/50">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-center text-muted-foreground text-center md:text-left">
+          <div className="flex justify-center items-center">
+            <p className="text-sm text-muted-foreground text-center">
               © {new Date().getFullYear()} {footerSettings?.copyrightText || "All rights reserved."}
             </p>
-            <div className="flex gap-6">
-              <Link
-                href="/privacy"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="/terms"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                href="/sitemap"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                Sitemap
-              </Link>
-            </div>
           </div>
         </div>
       </div>

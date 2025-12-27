@@ -99,7 +99,17 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
+    const deleteAll = searchParams.get("deleteAll");
 
+    // Delete all gallery images
+    if (deleteAll === "true") {
+      await GalleryImage.deleteMany({});
+      return NextResponse.json({
+        message: "All gallery images deleted successfully",
+      });
+    }
+
+    // Delete single gallery image
     if (!id) {
       return NextResponse.json(
         { message: "Gallery image ID is required" },

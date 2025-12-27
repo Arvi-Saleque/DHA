@@ -1,12 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Camera, Calendar, MapPin, Share2, Download } from "lucide-react";
+import { Camera, Calendar } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 
 interface GalleryImage {
   _id: string;
@@ -37,7 +44,8 @@ export default function GalleryPage() {
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     fetchImages();
@@ -76,29 +84,6 @@ export default function GalleryPage() {
     return galleryImages.filter((img) => img.category === selectedCat?.label);
   };
 
-  const handleShare = (image: GalleryImage) => {
-    if (navigator.share) {
-      navigator
-        .share({
-          title: image.title,
-          text: image.description,
-          url: window.location.href,
-        })
-        .catch((error) => console.log("Error sharing:", error));
-    } else {
-      alert("Share functionality not supported on this browser");
-    }
-  };
-
-  const handleDownload = (image: GalleryImage) => {
-    const link = document.createElement("a");
-    link.href = image.imageUrl;
-    link.download = `${image.title}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Hero Section */}
@@ -133,9 +118,27 @@ export default function GalleryPage() {
             </div>
           ) : (
             <>
+              {/* Mobile Dropdown Filter */}
+              <div className="md:hidden mb-6">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.label} ({category.count})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Desktop Tabs Filter */}
               <Tabs
                 defaultValue="all"
-                className="w-full"
+                value={selectedCategory}
+                className="w-full hidden md:block"
                 onValueChange={setSelectedCategory}
               >
                 <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 mb-8">
@@ -152,13 +155,17 @@ export default function GalleryPage() {
                     </TabsTrigger>
                   ))}
                 </TabsList>
+              </Tabs>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {getFilteredImages().map((image) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {getFilteredImages().map((image, index) => (
                     <Card
                       key={image._id}
                       className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-300"
-                      onClick={() => setSelectedImage(image)}
+                      onClick={() => {
+                        setLightboxIndex(index);
+                        setLightboxOpen(true);
+                      }}
                     >
                       <div className="relative h-64">
                         {isGoogleDriveUrl(image.imageUrl) ? (
@@ -185,96 +192,40 @@ export default function GalleryPage() {
                         <h3 className="font-semibold text-lg mb-2">
                           {image.title}
                         </h3>
-                        <div className="flex items-center text-sm text-gray-600 mb-2">
+                        <div className="flex items-center text-sm text-gray-600">
                           <Calendar className="w-4 h-4 mr-2" />
                           {new Date(image.date).toLocaleDateString()}
-                        </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <MapPin className="w-4 h-4 mr-2" />
-                          {image.location}
                         </div>
                       </CardContent>
                     </Card>
                   ))}
-                </div>
+              </div>
 
-                {getFilteredImages().length === 0 && (
-                  <div className="text-center py-12">
-                    <p className="text-lg text-gray-600">
-                      No images available in this category.
-                    </p>
-                  </div>
-                )}
-              </Tabs>
+              {getFilteredImages().length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-lg text-gray-600">
+                    No images available in this category.
+                  </p>
+                </div>
+              )}
             </>
           )}
         </div>
       </section>
 
-      {/* Lightbox Modal */}
-      <Dialog
-        open={selectedImage !== null}
-        onOpenChange={() => setSelectedImage(null)}
-      >
-        <DialogContent className="max-w-4xl">
-          {selectedImage && (
-            <div className="space-y-4">
-              <div className="relative h-96">
-                {isGoogleDriveUrl(selectedImage.imageUrl) ? (
-                  <iframe
-                    src={getImageUrl(selectedImage.imageUrl)}
-                    className="w-full h-full"
-                    allow="autoplay"
-                    title={selectedImage.title}
-                  />
-                ) : (
-                  <img
-                    src={selectedImage.imageUrl}
-                    alt={selectedImage.title}
-                    className="w-full h-full object-contain"
-                  />
-                )}
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-2">
-                  {selectedImage.title}
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {selectedImage.description}
-                </p>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    {new Date(selectedImage.date).toLocaleDateString()}
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    {selectedImage.location}
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => handleShare(selectedImage)}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share
-                </Button>
-                <Button
-                  onClick={() => handleDownload(selectedImage)}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Lightbox */}
+      <Lightbox
+        open={lightboxOpen}
+        close={() => setLightboxOpen(false)}
+        index={lightboxIndex}
+        slides={getFilteredImages().map((image) => ({
+          src: image.imageUrl,
+          alt: image.title,
+        }))}
+        styles={{
+          container: { backgroundColor: "rgba(0, 0, 0, 0.95)" },
+        }}
+      />
     </div>
   );
 }
