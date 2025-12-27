@@ -21,14 +21,30 @@ interface Review {
   isActive: boolean;
 }
 
+interface ReviewSettings {
+  _id?: string;
+  trustedByText: string;
+  familiesCount: string;
+  averageRatingText: string;
+  averageRatingValue: string;
+}
+
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [settings, setSettings] = useState<ReviewSettings>({
+    trustedByText: "Trusted by",
+    familiesCount: "500+ Families",
+    averageRatingText: "Average Rating",
+    averageRatingValue: "5.0/5.0",
+  });
+  const [loadingSettings, setLoadingSettings] = useState(true);
 
   useEffect(() => {
     fetchReviews();
+    fetchSettings();
   }, []);
 
   const fetchReviews = async () => {
@@ -42,6 +58,37 @@ export default function AdminReviewsPage() {
       console.error("Error fetching reviews:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch("/api/review-settings");
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(data);
+      }
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+    } finally {
+      setLoadingSettings(false);
+    }
+  };
+
+  const saveSettings = async () => {
+    try {
+      const response = await fetch("/api/review-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      });
+
+      if (response.ok) {
+        alert("Settings saved successfully!");
+      }
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      alert("Failed to save settings");
     }
   };
 
@@ -156,6 +203,73 @@ export default function AdminReviewsPage() {
           </Button>
         </div>
       </div>
+
+      {/* Settings Section */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Review Section Settings</CardTitle>
+          <CardDescription>
+            Customize the text displayed in the trust badges below the reviews
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loadingSettings ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-600"></div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Trusted By Text</label>
+                  <Input
+                    value={settings.trustedByText}
+                    onChange={(e) =>
+                      setSettings({ ...settings, trustedByText: e.target.value })
+                    }
+                    placeholder="Trusted by"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Families Count</label>
+                  <Input
+                    value={settings.familiesCount}
+                    onChange={(e) =>
+                      setSettings({ ...settings, familiesCount: e.target.value })
+                    }
+                    placeholder="500+ Families"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Average Rating Text</label>
+                  <Input
+                    value={settings.averageRatingText}
+                    onChange={(e) =>
+                      setSettings({ ...settings, averageRatingText: e.target.value })
+                    }
+                    placeholder="Average Rating"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Average Rating Value</label>
+                  <Input
+                    value={settings.averageRatingValue}
+                    onChange={(e) =>
+                      setSettings({ ...settings, averageRatingValue: e.target.value })
+                    }
+                    placeholder="5.0/5.0"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={saveSettings} className="bg-cyan-600 hover:bg-cyan-700">
+                  Save Settings
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 gap-4">
         {reviews.map((review) => (
