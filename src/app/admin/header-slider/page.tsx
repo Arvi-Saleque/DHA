@@ -18,7 +18,9 @@ interface Slide {
   subtitle: string;
   description: string;
   primaryButton: string;
+  primaryButtonUrl: string;
   secondaryButton: string;
+  secondaryButtonUrl: string;
   order: number;
   isActive: boolean;
 }
@@ -101,7 +103,9 @@ export default function HeaderSliderAdminPage() {
       subtitle: "",
       description: "",
       primaryButton: "Enroll Now",
+      primaryButtonUrl: "/admission",
       secondaryButton: "Learn More",
+      secondaryButtonUrl: "/about",
       order: slides.length + 1,
       isActive: true,
     });
@@ -302,6 +306,23 @@ export default function HeaderSliderAdminPage() {
                   />
                 </div>
                 <div>
+                  <Label htmlFor="primaryButtonUrl">Primary Button URL</Label>
+                  <Input
+                    id="primaryButtonUrl"
+                    value={editingSlide.primaryButtonUrl}
+                    onChange={(e) =>
+                      setEditingSlide({
+                        ...editingSlide,
+                        primaryButtonUrl: e.target.value,
+                      })
+                    }
+                    placeholder="/admission"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
                   <Label htmlFor="secondaryButton">Secondary Button Text</Label>
                   <Input
                     id="secondaryButton"
@@ -313,6 +334,20 @@ export default function HeaderSliderAdminPage() {
                       })
                     }
                     placeholder="Learn More"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="secondaryButtonUrl">Secondary Button URL</Label>
+                  <Input
+                    id="secondaryButtonUrl"
+                    value={editingSlide.secondaryButtonUrl}
+                    onChange={(e) =>
+                      setEditingSlide({
+                        ...editingSlide,
+                        secondaryButtonUrl: e.target.value,
+                      })
+                    }
+                    placeholder="/about"
                   />
                 </div>
               </div>

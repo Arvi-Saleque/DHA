@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import LinkCardButton from "@/components/common/link-card-button";
 import {
@@ -22,7 +23,9 @@ interface Slide {
   subtitle: string;
   description: string;
   primaryButton: string;
+  primaryButtonUrl: string;
   secondaryButton: string;
+  secondaryButtonUrl: string;
   order: number;
   isActive: boolean;
 }
@@ -75,14 +78,14 @@ export default function Header() {
 
   // Auto-play functionality
   React.useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying || slides.length === 0) return;
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000); // Change slide every 5 seconds
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, slides.length]);
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
@@ -137,7 +140,9 @@ export default function Header() {
                 fill
                 className="object-cover"
                 priority={index === 0}
-                quality={90}
+                loading={index === 0 ? "eager" : "lazy"}
+                sizes="100vw"
+                quality={85}
               />
               {/* Overlay Gradient */}
               <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
@@ -147,40 +152,44 @@ export default function Header() {
             {/* Content */}
             <div className="relative z-10 flex h-full items-center">
               <div className="container mx-auto px-4">
-                <div className="max-w-3xl space-y-6 animate-fade-in">
+                <div className="max-w-3xl space-y-4 sm:space-y-6 animate-fade-in text-center sm:text-left">
                   {/* Subtitle Badge */}
-                  <div className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-4 py-2 backdrop-blur-sm border border-primary/30">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur-sm border border-primary/30">
                     <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-xs sm:text-sm font-medium text-white">
                       {slide.subtitle}
                     </span>
                   </div>
 
                   {/* Main Title */}
-                  <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-white">
                     {slide.title}
                   </h1>
 
                   {/* Description */}
-                  <p className="text-base text-gray-200 sm:text-lg md:text-xl lg:text-2xl">
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 px-2 sm:px-0">
                     {slide.description}
                   </p>
 
                   {/* Buttons */}
-                  <div className="flex flex-wrap gap-4 pt-4">
-                    <Button
-                      size="lg"
-                      className="h-12 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
-                    >
-                      {slide.primaryButton}
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="h-12 px-8 text-base font-semibold bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 hover:text-white shadow-lg"
-                    >
-                      {slide.secondaryButton}
-                    </Button>
+                  <div className="flex flex-wrap gap-3 sm:gap-4 pt-4 justify-center sm:justify-start">
+                    <Link href={slide.primaryButtonUrl || "/admission"}>
+                      <Button
+                        size="lg"
+                        className="h-10 px-5 text-sm sm:h-12 sm:px-8 sm:text-base font-semibold shadow-lg hover:shadow-xl transition-all"
+                      >
+                        {slide.primaryButton}
+                      </Button>
+                    </Link>
+                    <Link href={slide.secondaryButtonUrl || "/about"}>
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="h-10 px-5 text-sm sm:h-12 sm:px-8 sm:text-base font-semibold bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 hover:text-white shadow-lg"
+                      >
+                        {slide.secondaryButton}
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -193,17 +202,17 @@ export default function Header() {
           <>
             <button
               onClick={prevSlide}
-              className="absolute left-2 sm:left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/10 p-2 sm:p-3 backdrop-blur-sm border border-white/20 text-white transition-all hover:bg-white/20 hover:scale-110"
+              className="absolute left-1 sm:left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/10 p-1 sm:p-3 backdrop-blur-sm border border-white/20 text-white transition-all hover:bg-white/20 hover:scale-110"
               aria-label="Previous slide"
             >
-              <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+              <ChevronLeft className="h-3 w-3 sm:h-6 sm:w-6" />
             </button>
             <button
               onClick={nextSlide}
-              className="absolute right-2 sm:right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/10 p-2 sm:p-3 backdrop-blur-sm border border-white/20 text-white transition-all hover:bg-white/20 hover:scale-110"
+              className="absolute right-1 sm:right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/10 p-1 sm:p-3 backdrop-blur-sm border border-white/20 text-white transition-all hover:bg-white/20 hover:scale-110"
               aria-label="Next slide"
             >
-              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+              <ChevronRight className="h-3 w-3 sm:h-6 sm:w-6" />
             </button>
 
             {/* Dots Navigation */}
@@ -226,14 +235,6 @@ export default function Header() {
         )}
         </>
         )}
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-24 left-1/2 z-20 -translate-x-1/2 animate-bounce">
-          <div className="flex flex-col items-center gap-2 text-white/80">
-            <span className="text-xs font-medium">Scroll Down</span>
-            <ChevronRight className="h-4 w-4 rotate-90" />
-          </div>
-        </div>
       </div>
 
       {/* Features Section (Below Slider) */}
