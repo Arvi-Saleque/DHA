@@ -22,9 +22,19 @@ const HeaderSlideSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    primaryButtonUrl: {
+      type: String,
+      required: true,
+      default: "/admission",
+    },
     secondaryButton: {
       type: String,
       required: true,
+    },
+    secondaryButtonUrl: {
+      type: String,
+      required: true,
+      default: "/about",
     },
     order: {
       type: Number,
