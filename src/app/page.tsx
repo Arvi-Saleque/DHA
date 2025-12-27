@@ -43,6 +43,14 @@ export default function Home() {
     isActive: boolean;
   }>>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
+  const [reviewSettings, setReviewSettings] = useState({
+    trustedByText: "Trusted by",
+    familiesCount: "500+ Families",
+    averageRatingText: "Average Rating",
+    averageRatingValue: "5.0/5.0",
+  });
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
   const [newsEvents, setNewsEvents] = useState<Array<{
     _id: string;
     title: string;
@@ -109,6 +117,7 @@ export default function Home() {
     fetchNewsEvents();
     fetchGallery();
     fetchAboutUs();
+    fetchReviewSettings();
   }, []);
 
   const fetchHomePage = async () => {
@@ -185,6 +194,18 @@ export default function Home() {
     }
   };
 
+  const fetchReviewSettings = async () => {
+    try {
+      const response = await fetch("/api/review-settings");
+      if (response.ok) {
+        const data = await response.json();
+        setReviewSettings(data);
+      }
+    } catch (error) {
+      console.error("Error fetching review settings:", error);
+    }
+  };
+
   const getIcon = (iconName: string) => {
     const Icon = (Icons as any)[iconName];
     return Icon || BookOpen;
@@ -204,6 +225,32 @@ export default function Home() {
 
   const goToReview = (index: number) => {
     setCurrentReview(index);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && currentReview < reviews.length - 1) {
+      nextReview();
+    }
+    if (isRightSwipe && currentReview > 0) {
+      prevReview();
+    }
+    
+    setTouchStart(0);
+    setTouchEnd(0);
   };
 
   return (
@@ -437,6 +484,9 @@ export default function Home() {
                   <div
                     className="transition-transform duration-700 ease-in-out"
                     style={{ transform: `translateX(-${currentReview * 100}%)` }}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
                   >
                     <div className="flex">
                       {reviews
@@ -594,8 +644,8 @@ export default function Home() {
                     <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="text-xs sm:text-sm text-slate-500 font-medium">Trusted by</p>
-                    <p className="text-lg sm:text-xl font-bold text-slate-900">500+ Families</p>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium">{reviewSettings.trustedByText}</p>
+                    <p className="text-lg sm:text-xl font-bold text-slate-900">{reviewSettings.familiesCount}</p>
                   </div>
                 </div>
                 <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-white rounded-2xl shadow-lg border-2 border-cyan-100 hover:shadow-xl transition-shadow">
@@ -603,8 +653,8 @@ export default function Home() {
                     <Star className="w-5 h-5 sm:w-6 sm:h-6 fill-white text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="text-xs sm:text-sm text-slate-500 font-medium">Average Rating</p>
-                    <p className="text-lg sm:text-xl font-bold text-slate-900">5.0/5.0</p>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium">{reviewSettings.averageRatingText}</p>
+                    <p className="text-lg sm:text-xl font-bold text-slate-900">{reviewSettings.averageRatingValue}</p>
                   </div>
                 </div>
               </div>
