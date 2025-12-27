@@ -1,9 +1,22 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Upload, X, Loader2, Image as ImageIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+interface CloudinaryImage {
+  url: string;
+  publicId: string;
+  thumbnail: string;
+  createdAt: string;
+}
 
 interface ImageUploaderProps {
   label?: string;
@@ -26,7 +39,30 @@ export default function ImageUploader({
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [showGallery, setShowGallery] = useState(false);
+  const [cloudinaryImages, setCloudinaryImages] = useState<CloudinaryImage[]>([]);
+  const [loadingGallery, setLoadingGallery] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const fetchCloudinaryImages = async () => {
+    setLoadingGallery(true);
+    try {
+      const res = await fetch(`/api/cloudinary-images?folder=${folder}`);
+      const data = await res.json();
+      if (data.success) {
+        setCloudinaryImages(data.images);
+      }
+    } catch (error) {
+      console.error("Failed to fetch Cloudinary images:", error);
+    } finally {
+      setLoadingGallery(false);
+    }
+  };
+
+  const handleOpenGallery = () => {
+    setShowGallery(true);
+    fetchCloudinaryImages();
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -77,6 +113,11 @@ export default function ImageUploader({
     }
   };
 
+  const handleSelectImage = (url: string) => {
+    onChange(url);
+    setShowGallery(false);
+  };
+
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
@@ -102,7 +143,7 @@ export default function ImageUploader({
           </div>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <input
             ref={fileInputRef}
             type="file"
@@ -118,7 +159,6 @@ export default function ImageUploader({
             variant="outline"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="w-full sm:w-auto"
           >
             {uploading ? (
               <>
@@ -128,9 +168,19 @@ export default function ImageUploader({
             ) : (
               <>
                 <Upload className="w-4 h-4 mr-2" />
-                {value ? "Change Image" : "Upload Image"}
+                Upload New
               </>
             )}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleOpenGallery}
+            disabled={uploading}
+          >
+            <ImageIcon className="w-4 h-4 mr-2" />
+            Select Existing
           </Button>
 
           {value && !uploading && (
@@ -154,6 +204,46 @@ export default function ImageUploader({
           </p>
         )}
       </div>
+
+      {/* Cloudinary Image Gallery Dialog */}
+      <Dialog open={showGallery} onOpenChange={setShowGallery}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Select from Uploaded Images</DialogTitle>
+          </DialogHeader>
+          
+          {loadingGallery ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-cyan-600" />
+            </div>
+          ) : cloudinaryImages.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              No images found. Upload a new image to get started.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {cloudinaryImages.map((img) => (
+                <div
+                  key={img.publicId}
+                  className="relative group cursor-pointer rounded-lg overflow-hidden border-2 border-transparent hover:border-cyan-500 transition-all"
+                  onClick={() => handleSelectImage(img.url)}
+                >
+                  <img
+                    src={img.thumbnail}
+                    alt={img.publicId}
+                    className="w-full h-32 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">
+                      Select
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

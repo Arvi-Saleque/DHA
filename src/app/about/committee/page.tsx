@@ -7,6 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Users,
   Shield,
   Briefcase,
@@ -215,23 +222,29 @@ export default function CommitteePage() {
 
       {/* Introduction Section */}
       <section className="container mx-auto px-4 py-20">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <Badge variant="outline" className="mb-4">
-            <Shield className="w-3 h-3 mr-1" />
-            Our Leadership
-          </Badge>
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">
-            {data.sectionTitle}
-          </h2>
-          <p className="text-lg text-slate-600">
-            {data.sectionDescription}
-          </p>
+        {/* Committee Members Grid with Tabs */}
+        
+        {/* Mobile Dropdown */}
+        <div className="md:hidden mb-8">
+          <Select value={activeCategory} onValueChange={setActiveCategory}>
+            <SelectTrigger className="w-full h-12 text-base">
+              <SelectValue placeholder="Select Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All Members</SelectItem>
+              {activeCategories.map((cat) => (
+                <SelectItem key={cat.name} value={cat.name}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Committee Members Grid with Tabs */}
+        {/* Desktop Tabs */}
         <Tabs
           defaultValue="All"
-          className="max-w-7xl mx-auto mb-20"
+          className="hidden md:block max-w-7xl mx-auto mb-20"
           onValueChange={(value) => setActiveCategory(value)}
         >
           <TabsList
@@ -281,47 +294,70 @@ export default function CommitteePage() {
           </TabsContent>
         </Tabs>
 
-        {/* Responsibilities Section */}
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <Badge variant="outline" className="mb-4">
-              <Target className="w-3 h-3 mr-1" />
-              Key Responsibilities
-            </Badge>
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              {data.responsibilitiesTitle}
-            </h2>
-            <p className="text-lg text-slate-600">
-              {data.responsibilitiesSubtitle}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {data.responsibilities.map((item, index) => {
-              const IconComponent = iconMap[item.icon] || Target;
-              return (
-                <Card
+        {/* Mobile Content (outside Tabs) */}
+        <div className="md:hidden mb-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {getFilteredMembers().length > 0 ? (
+              getFilteredMembers().map((member, index) => (
+                <CommitteeMemberCard
                   key={index}
-                  className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 bg-gradient-to-br from-white to-slate-50"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <IconComponent className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-slate-900 mb-2">
-                          {item.title}
-                        </h3>
-                        <p className="text-slate-600">{item.description}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                  member={member}
+                  getColorClasses={getColorClasses}
+                />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-slate-500">
+                  No members found in this category
+                </p>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Responsibilities Section */}
+        {data.responsibilities && data.responsibilities.length > 0 && (
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <Badge variant="outline" className="mb-4">
+                <Target className="w-3 h-3 mr-1" />
+                Key Responsibilities
+              </Badge>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">
+                {data.responsibilitiesTitle}
+              </h2>
+              <p className="text-lg text-slate-600">
+                {data.responsibilitiesSubtitle}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {data.responsibilities.map((item, index) => {
+                const IconComponent = iconMap[item.icon] || Target;
+                return (
+                  <Card
+                    key={index}
+                    className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 bg-gradient-to-br from-white to-slate-50"
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <IconComponent className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-slate-900 mb-2">
+                            {item.title}
+                          </h3>
+                          <p className="text-slate-600">{item.description}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );
@@ -393,26 +429,33 @@ function CommitteeMemberCard({
           </p>
 
           {/* Contact Information */}
-          {(member.email || member.phone) && (
-            <div className="flex flex-wrap gap-2 pt-4 border-t">
-              {member.email && (
-                <Button asChild variant="outline" size="sm">
-                  <a href={`mailto:${member.email}`}>
-                    <Mail className="w-3 h-3 mr-1" />
-                    Email
-                  </a>
-                </Button>
-              )}
-              {member.phone && (
-                <Button asChild variant="outline" size="sm">
-                  <a href={`tel:${member.phone}`}>
-                    <Phone className="w-3 h-3 mr-1" />
-                    Call
-                  </a>
-                </Button>
-              )}
-            </div>
-          )}
+          <div className="space-y-2 pt-4 border-t">
+            {member.email && (
+              <Button
+                variant="outline"
+                className="w-full group/btn hover:bg-cyan-50 hover:border-cyan-600"
+                asChild
+              >
+                <a href={`mailto:${member.email}`}>
+                  <Mail className="w-4 h-4 mr-2 group-hover/btn:text-cyan-600 transition-colors" />
+                  <span className="text-sm truncate">{member.email}</span>
+                </a>
+              </Button>
+            )}
+            
+            {member.phone && (
+              <Button
+                variant="outline"
+                className="w-full group/btn hover:bg-cyan-50 hover:border-cyan-600"
+                asChild
+              >
+                <a href={`tel:${member.phone}`}>
+                  <Phone className="w-4 h-4 mr-2 group-hover/btn:text-cyan-600 transition-colors" />
+                  <span className="text-sm truncate">{member.phone}</span>
+                </a>
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

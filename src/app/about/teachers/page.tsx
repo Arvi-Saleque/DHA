@@ -7,6 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   GraduationCap,
   Award,
   BookOpen,
@@ -157,21 +164,27 @@ export default function TeachersPage() {
 
       {/* Teachers Grid Section */}
       <section className="container mx-auto px-4 pb-20">
-        <div className="text-center mb-12">
-          <Badge variant="outline" className="mb-4">
-            <Star className="w-3 h-3 mr-1" />
-            Meet Our Team
-          </Badge>
-          <h2 className="text-4xl font-bold text-slate-900 mb-4">
-            {data.sectionTitle}
-          </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            {data.sectionDescription}
-          </p>
+        {/* Category Tabs */}
+        
+        {/* Mobile Dropdown */}
+        <div className="md:hidden mb-8">
+          <Select value={activeCategory} onValueChange={setActiveCategory}>
+            <SelectTrigger className="w-full h-12 text-base">
+              <SelectValue placeholder="Select Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All</SelectItem>
+              {activeCategories.filter(cat => cat.name !== "All").map((cat) => (
+                <SelectItem key={cat.name} value={cat.name}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Category Tabs */}
-        <Tabs defaultValue="All" className="max-w-7xl mx-auto mb-8" onValueChange={(value) => setActiveCategory(value)}>
+        {/* Desktop Tabs */}
+        <Tabs defaultValue="All" className="hidden md:block max-w-7xl mx-auto mb-8" onValueChange={(value) => setActiveCategory(value)}>
           <TabsList className={`grid w-full gap-2 bg-slate-100 p-2 rounded-xl mb-8`} style={{ gridTemplateColumns: `repeat(${Math.min(activeCategories.length + 1, 5)}, minmax(0, 1fr))` }}>
             <TabsTrigger value="All" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
               All
@@ -200,6 +213,20 @@ export default function TeachersPage() {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Mobile Content (outside Tabs) */}
+        <div className="md:hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {getFilteredTeachers().map((teacher, index) => (
+              <TeacherCard key={index} teacher={teacher} />
+            ))}
+          </div>
+          {getFilteredTeachers().length === 0 && (
+            <p className="text-center text-slate-500 py-16">
+              No teachers found in this category.
+            </p>
+          )}
+        </div>
       </section>
 
       {/* Quote Section */}

@@ -18,14 +18,6 @@ const GalleryImageSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    location: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
     order: {
       type: Number,
       default: 0,

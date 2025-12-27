@@ -17,8 +17,6 @@ interface GalleryImage {
   category: string;
   imageUrl: string;
   date: string;
-  location: string;
-  description: string;
   order: number;
 }
 
@@ -42,8 +40,6 @@ export default function GalleryAdminPage() {
     category: "Academic Events",
     imageUrl: "",
     date: new Date().toISOString().split("T")[0],
-    location: "",
-    description: "",
     order: 0,
   };
 
@@ -73,14 +69,6 @@ export default function GalleryAdminPage() {
     }
     if (!editingItem.imageUrl.trim()) {
       setMessage("Error: Image URL is required");
-      return;
-    }
-    if (!editingItem.location.trim()) {
-      setMessage("Error: Location is required");
-      return;
-    }
-    if (!editingItem.description.trim()) {
-      setMessage("Error: Description is required");
       return;
     }
 
@@ -144,6 +132,30 @@ export default function GalleryAdminPage() {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (!confirm("Are you sure you want to delete ALL gallery images? This action cannot be undone!")) return;
+    if (!confirm("This will permanently delete all gallery images. Are you absolutely sure?")) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/gallery?deleteAll=true", {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setMessage("All gallery images deleted successfully!");
+        fetchImages();
+      } else {
+        setMessage("Failed to delete all images");
+      }
+    } catch (error) {
+      setMessage("Failed to delete all images");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getCategoryBadge = (category: string) => {
     const styles: { [key: string]: string } = {
       "Academic Events": "bg-blue-100 text-blue-700",
@@ -165,18 +177,31 @@ export default function GalleryAdminPage() {
             Upload and manage gallery images
           </p>
         </div>
-        {!isCreating && !editingItem && (
-          <Button
-            onClick={() => {
-              setIsCreating(true);
-              setEditingItem(emptyImage);
-            }}
-            size="lg"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Image
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {images.length > 0 && (
+            <Button
+              onClick={handleDeleteAll}
+              variant="destructive"
+              size="lg"
+              disabled={loading}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete All
+            </Button>
+          )}
+          {!isCreating && !editingItem && (
+            <Button
+              onClick={() => {
+                setIsCreating(true);
+                setEditingItem(emptyImage);
+              }}
+              size="lg"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Image
+            </Button>
+          )}
+        </div>
       </div>
 
       {message && (
@@ -258,29 +283,6 @@ export default function GalleryAdminPage() {
                     setEditingItem({ ...editingItem!, imageUrl: url })
                   }
                   folder="gallery"
-                />
-              </div>
-
-              <div className="col-span-2">
-                <Label>Location *</Label>
-                <Input
-                  value={editingItem?.location || ""}
-                  onChange={(e) =>
-                    setEditingItem({ ...editingItem!, location: e.target.value })
-                  }
-                  placeholder="Location where photo was taken"
-                />
-              </div>
-
-              <div className="col-span-2">
-                <Label>Description *</Label>
-                <Textarea
-                  value={editingItem?.description || ""}
-                  onChange={(e) =>
-                    setEditingItem({ ...editingItem!, description: e.target.value })
-                  }
-                  placeholder="Brief description of the image"
-                  rows={3}
                 />
               </div>
 
