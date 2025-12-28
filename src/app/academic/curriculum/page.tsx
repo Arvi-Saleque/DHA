@@ -24,6 +24,7 @@ interface Curriculum {
   _id: string;
   category: string;
   pdfUrl: string;
+  totalPages?: number;
 }
 
 // Convert Google Drive link to embed URL

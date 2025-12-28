@@ -17,6 +17,7 @@ interface Curriculum {
   _id: string;
   category: string;
   pdfUrl: string;
+  totalPages?: number;
 }
 
 const CATEGORIES = ['Pre Hifz', 'Hifz', 'Post Hifz'];
