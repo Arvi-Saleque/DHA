@@ -7,7 +7,7 @@ export async function POST() {
     await connectDB();
     
     // Drop the galleryimages collection
-    await mongoose.connection.db.dropCollection("galleryimages");
+    await mongoose.connection.db?.dropCollection("galleryimages");
     
     return NextResponse.json({
       success: true,
