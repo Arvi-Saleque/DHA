@@ -6,7 +6,7 @@ import { sendAutomaticNotification } from '@/lib/newsletter';
 export async function GET() {
   try {
     await connectDB();
-    const curriculums = await Curriculum.find({ isActive: true }).sort({ className: 1 });
+    const curriculums = await Curriculum.find().sort({ category: 1 });
     return NextResponse.json(curriculums);
   } catch (error) {
     console.error('Error fetching curriculums:', error);
@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
     await sendAutomaticNotification({
       type: 'academic',
       title: 'New Curriculum Published',
-      message: `New curriculum has been published for ${curriculum.className}.`,
-      link: `/academic/curriculum?class=${encodeURIComponent(curriculum.className)}`
+      message: `New curriculum has been published for ${curriculum.category}.`,
+      link: `/academic/curriculum`
     });
     
     return NextResponse.json(curriculum, { status: 201 });
