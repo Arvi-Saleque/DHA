@@ -74,20 +74,29 @@ export default function CurriculumPage() {
     }
   };
 
-  const handleDownload = (pdfUrl: string) => {
-    // Check if it's a Google Drive URL
-    const match = pdfUrl.match(/\/file\/d\/([^\/]+)/);
-    if (match && match[1]) {
-      window.open(`https://drive.google.com/uc?export=download&id=${match[1]}`, '_blank');
-    } else {
-      // For other URLs, trigger download
-      const link = document.createElement('a');
-      link.href = pdfUrl;
-      link.download = 'curriculum.pdf';
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  const handleDownload = async (pdfUrl: string) => {
+    try {
+      // Check if it's a Google Drive URL
+      const match = pdfUrl.match(/\/file\/d\/([^\/]+)/);
+      if (match && match[1]) {
+        window.open(`https://drive.google.com/uc?export=download&id=${match[1]}`, '_blank');
+      } else {
+        // For Cloudinary URLs, fetch and download
+        const response = await fetch(pdfUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `curriculum-${Date.now()}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback to opening in new tab
+      window.open(pdfUrl, '_blank');
     }
   };
 
