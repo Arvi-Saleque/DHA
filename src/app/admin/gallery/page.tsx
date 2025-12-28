@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Plus, Save, Edit, X, Calendar, MapPin, Image as ImageIcon } from "lucide-react";
+import { Trash2, Plus, Save, Edit, X, Calendar, Image as ImageIcon } from "lucide-react";
 import ImageUploader from "@/components/common/ImageUploader";
 
 interface GalleryImage {
@@ -352,14 +352,7 @@ export default function GalleryAdminPage() {
                       <Calendar className="w-3 h-3" />
                       {new Date(item.date).toLocaleDateString()}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-3 h-3" />
-                      {item.location}
-                    </div>
                   </div>
-                  <p className="text-xs text-slate-600 line-clamp-2 mb-3">
-                    {item.description}
-                  </p>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
