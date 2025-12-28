@@ -6,13 +6,6 @@ export async function POST() {
   try {
     await connectDB();
     
-    if (!mongoose.connection.db) {
-      return NextResponse.json(
-        { success: false, error: "Database connection not established" },
-        { status: 500 }
-      );
-    }
-    
     // Drop the galleryimages collection
     await mongoose.connection.db.dropCollection("galleryimages");
     

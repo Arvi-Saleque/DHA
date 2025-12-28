@@ -25,17 +25,18 @@ export async function POST(request: NextRequest) {
 
     // Determine resource type based on file type
     const isPDF = file.type === "application/pdf";
-    const resourceType = isPDF ? "raw" : "image";
+    // CRITICAL: Use 'auto' for PDFs so Cloudinary treats them as images, enabling page transformation
+    const resourceType = isPDF ? "auto" : "image";
 
     // Upload to Cloudinary with appropriate settings
     const uploadOptions: any = {
       folder: folder,
       resource_type: resourceType,
-      access_mode: "public", // Ensure public access
-      type: "upload", // Explicitly set upload type
+      access_mode: "public",
+      type: "upload",
     };
 
-    // For PDFs, ensure they can be accessed directly
+    // For PDFs, Cloudinary will automatically detect and allow page extraction
     if (isPDF) {
       uploadOptions.format = "pdf";
     }
