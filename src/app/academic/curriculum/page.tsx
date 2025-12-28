@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,12 @@ import {
   CheckCircle2,
   X,
 } from "lucide-react";
+
+// Dynamically import PDF viewer with no SSR
+const MobilePDFViewer = dynamic(
+  () => import('@/components/common/MobilePDFViewer'),
+  { ssr: false }
+);
 
 interface Curriculum {
   _id: string;
@@ -69,14 +76,13 @@ export default function CurriculumPage() {
   };
 
   const handleViewDetails = (pdfUrl: string) => {
-    // Check if it's a Google Drive URL
-    const match = pdfUrl.match(/\/file\/d\/([^\/]+)/);
-    if (match && match[1]) {
-      window.open(`https://drive.google.com/file/d/${match[1]}/view`, '_blank');
-    } else {
-      // For other URLs (Cloudinary, etc.), open directly
-      window.open(pdfUrl, '_blank');
-    }
+    setLightboxPdfUrl(pdfUrl);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+    setLightboxPdfUrl("");
   };
 
   const handleDownload = (pdfUrl: string) => {
@@ -254,46 +260,51 @@ export default function CurriculumPage() {
                       {group.curriculum ? (
                         <Card className="border-2 hover:border-cyan-300 transition-all overflow-hidden">
                           <div className="relative">
-                            {/* PDF Viewer Section */}
+                            {/* PDF Viewer Section - Desktop Only */}
                             <div 
-                              className="relative h-[400px] sm:h-[500px] md:h-[600px] bg-slate-100 cursor-pointer group"
+                              className="relative hidden md:block h-[600px] bg-slate-100 cursor-pointer group"
                               onClick={() => {
                                 setLightboxPdfUrl(group.curriculum!.pdfUrl);
                                 setLightboxOpen(true);
                               }}
                             >
-                            <iframe
-                              src={convertGoogleDriveUrl(group.curriculum.pdfUrl)}
-                              className="w-full h-full border-0 pointer-events-none"
-                              allow="autoplay"
-                            />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
-                              <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-4">
-                                <Eye className="w-8 h-8 text-cyan-600" />
+                              <iframe
+                                src={convertGoogleDriveUrl(group.curriculum.pdfUrl)}
+                                className="w-full h-full border-0 pointer-events-none"
+                                allow="autoplay"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-4">
+                                  <Eye className="w-8 h-8 text-cyan-600" />
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          {/* Action Buttons */}
-                          <div className="p-4 sm:p-6 bg-slate-50 flex flex-col sm:flex-row gap-3">
-                            <Button
-                              variant="outline"
-                              className="flex-1"
-                              onClick={() => handleViewDetails(group.curriculum!.pdfUrl)}
-                            >
-                              <Eye className="w-4 h-4 mr-2" />
-                              View Full Details
-                            </Button>
-                            <Button
-                              className="flex-1 bg-cyan-600 hover:bg-cyan-700"
-                              onClick={() => handleDownload(group.curriculum!.pdfUrl)}
-                            >
-                              <Download className="w-4 h-4 mr-2" />
-                              Download PDF
-                            </Button>
+                            {/* Mobile PDF Preview */}
+                            <div className="md:hidden">
+                              <MobilePDFViewer pdfUrl={group.curriculum.pdfUrl} />
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="p-4 sm:p-6 bg-white flex flex-col sm:flex-row gap-3">
+                              <Button
+                                variant="outline"
+                                className="flex-1 hidden md:flex items-center justify-center"
+                                onClick={() => handleViewDetails(group.curriculum!.pdfUrl)}
+                              >
+                                <Eye className="w-4 h-4 mr-2" />
+                                View Fullscreen
+                              </Button>
+                              <Button
+                                className="flex-1 bg-cyan-600 hover:bg-cyan-700"
+                                onClick={() => handleDownload(group.curriculum!.pdfUrl)}
+                              >
+                                <Download className="w-4 h-4 mr-2" />
+                                Download PDF
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      </Card>
+                        </Card>
                       ) : (
                         <div className="text-center py-12">
                           <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
