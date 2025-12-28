@@ -289,7 +289,7 @@ export default function CurriculumPage() {
                             <div className="p-4 sm:p-6 bg-white flex flex-col sm:flex-row gap-3">
                               <Button
                                 variant="outline"
-                                className="flex-1 hidden md:flex items-center justify-center"
+                                className="flex-1 flex items-center justify-center"
                                 onClick={() => handleViewDetails(group.curriculum!.pdfUrl)}
                               >
                                 <Eye className="w-4 h-4 mr-2" />
