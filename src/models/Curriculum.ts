@@ -1,27 +1,21 @@
 import mongoose from 'mongoose';
 
 const CurriculumSchema = new mongoose.Schema({
-  className: {
+  category: {
     type: String,
     required: true,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  points: {
-    type: [String],
-    required: true,
+    enum: ['Pre Hifz', 'Hifz', 'Post Hifz'],
+    unique: true,
   },
   pdfUrl: {
     type: String,
     required: true,
   },
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
   createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
     type: Date,
     default: Date.now,
   },

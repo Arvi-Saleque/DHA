@@ -6,6 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   BookOpen,
   Download,
@@ -17,15 +25,13 @@ import {
   Target,
   Award,
   CheckCircle2,
+  X,
 } from "lucide-react";
 
 interface Curriculum {
   _id: string;
-  className: string;
-  title: string;
-  points: string[];
+  category: string;
   pdfUrl: string;
-  isActive: boolean;
 }
 
 // Convert Google Drive link to embed URL
@@ -40,9 +46,11 @@ const convertGoogleDriveUrl = (url: string): string => {
 export default function CurriculumPage() {
   const [curriculums, setCurriculums] = useState<Curriculum[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedClass, setSelectedClass] = useState("Play Group");
+  const [selectedCategory, setSelectedCategory] = useState("Pre Hifz");
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxPdfUrl, setLightboxPdfUrl] = useState("");
 
-  const classes = ['Play Group', 'Nursery', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7'];
+  const categories = ['Pre Hifz', 'Hifz', 'Post Hifz'];
 
   useEffect(() => {
     fetchCurriculums();
@@ -61,23 +69,37 @@ export default function CurriculumPage() {
   };
 
   const handleViewDetails = (pdfUrl: string) => {
+    // Check if it's a Google Drive URL
     const match = pdfUrl.match(/\/file\/d\/([^\/]+)/);
     if (match && match[1]) {
       window.open(`https://drive.google.com/file/d/${match[1]}/view`, '_blank');
+    } else {
+      // For other URLs (Cloudinary, etc.), open directly
+      window.open(pdfUrl, '_blank');
     }
   };
 
   const handleDownload = (pdfUrl: string) => {
+    // Check if it's a Google Drive URL
     const match = pdfUrl.match(/\/file\/d\/([^\/]+)/);
     if (match && match[1]) {
       window.open(`https://drive.google.com/uc?export=download&id=${match[1]}`, '_blank');
+    } else {
+      // For other URLs, trigger download
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = 'curriculum.pdf';
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   };
 
-  const classGroups = classes.map(cls => ({
-    id: cls.toLowerCase().replace(' ', '-'),
-    label: cls,
-    curriculums: curriculums.filter((c) => c.className === cls),
+  const categoryGroups = categories.map(cat => ({
+    id: cat.toLowerCase().replace(' ', '-'),
+    label: cat,
+    curriculum: curriculums.find((c) => c.category === cat),
   }));
 
   return (
@@ -169,16 +191,16 @@ export default function CurriculumPage() {
         </div>
       </section>
 
-      {/* Main Content - Curriculum by Class Level */}
+      {/* Main Content - Curriculum by Category */}
       <section className="container mx-auto px-4 pb-20">
         <Card className="border-none shadow-xl">
           <CardHeader className="border-b bg-slate-50/50">
             <CardTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
               <FileText className="w-6 h-6 text-cyan-600" />
-              Curriculum by Class Level
+              Curriculum by Category
             </CardTitle>
             <p className="text-sm text-slate-600 mt-2">
-              Select a class to view detailed curriculum information
+              Select a category to view detailed curriculum information
             </p>
           </CardHeader>
 
@@ -189,109 +211,104 @@ export default function CurriculumPage() {
                 <p className="text-slate-600 mt-4">Loading curriculums...</p>
               </div>
             ) : (
-              <Tabs
-                value={selectedClass}
-                onValueChange={setSelectedClass}
-                className="w-full"
-              >
-                <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2 bg-slate-100 p-2 rounded-xl mb-8 h-auto">
-                  {classGroups.map((group) => (
-                    <TabsTrigger
-                      key={group.id}
-                      value={group.label}
-                      className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white text-xs sm:text-sm py-2"
-                    >
-                      {group.label}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+              <>
+                {/* Mobile Dropdown Filter */}
+                <div className="md:hidden mb-6">
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoryGroups.map((group) => (
+                        <SelectItem key={group.id} value={group.label}>
+                          {group.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                {classGroups.map((group) => (
-                  <TabsContent
-                    key={group.id}
-                    value={group.label}
-                    className="space-y-6"
-                  >
-                    {group.curriculums.length > 0 ? (
-                      <div className="grid grid-cols-1 gap-6">
-                        {group.curriculums.map((curriculum) => (
-                          <Card
-                            key={curriculum._id}
-                            className="border-2 hover:border-cyan-300 transition-all overflow-hidden group"
-                          >
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-                              {/* PDF Viewer Section */}
-                              <div className="relative h-96 lg:h-auto overflow-hidden bg-slate-100">
-                                <iframe
-                                  src={convertGoogleDriveUrl(curriculum.pdfUrl)}
-                                  className="w-full h-full border-0"
-                                  allow="autoplay"
-                                />
-                              </div>
+                {/* Desktop Tabs Filter */}
+                <Tabs
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
+                  className="w-full hidden md:block"
+                >
+                  <TabsList className="grid w-full grid-cols-3 gap-2 bg-slate-100 p-2 rounded-xl mb-8 h-auto">
+                    {categoryGroups.map((group) => (
+                      <TabsTrigger
+                        key={group.id}
+                        value={group.label}
+                        className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white text-sm py-3"
+                      >
+                        {group.label}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
 
-                              {/* Content Section */}
-                              <div className="p-6 lg:p-8 flex flex-col justify-between">
-                                <div>
-                                  <div className="flex items-start justify-between mb-4">
-                                    <div>
-                                      <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                                        {curriculum.title}
-                                      </h3>
-                                      <Badge variant="outline" className="gap-1">
-                                        <GraduationCap className="w-3 h-3" />
-                                        {curriculum.className}
-                                      </Badge>
-                                    </div>
-                                  </div>
-
-                                  {/* Key Points */}
-                                  <div className="space-y-3 mb-6">
-                                    {curriculum.points.map((point, idx) => (
-                                      <div key={idx} className="flex items-start gap-2 text-sm text-slate-600">
-                                        <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                        <span>{point}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-
-                                {/* Action Buttons */}
-                                <div className="flex gap-3 mt-6">
-                                  <Button
-                                    variant="outline"
-                                    className="flex-1"
-                                    onClick={() => handleViewDetails(curriculum.pdfUrl)}
-                                  >
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    View Details
-                                  </Button>
-                                  <Button
-                                    className="flex-1 bg-cyan-600 hover:bg-cyan-700"
-                                    onClick={() => handleDownload(curriculum.pdfUrl)}
-                                  >
-                                    <Download className="w-4 h-4 mr-2" />
-                                    Download PDF
-                                  </Button>
-                                </div>
+                {/* Content for both mobile and desktop */}
+                {categoryGroups.map((group) => (
+                  selectedCategory === group.label && (
+                    <div key={group.id} className="space-y-6">
+                      {group.curriculum ? (
+                        <Card className="border-2 hover:border-cyan-300 transition-all overflow-hidden">
+                          <div className="relative">
+                            {/* PDF Viewer Section */}
+                            <div 
+                              className="relative h-[400px] sm:h-[500px] md:h-[600px] bg-slate-100 cursor-pointer group"
+                              onClick={() => {
+                                setLightboxPdfUrl(group.curriculum!.pdfUrl);
+                                setLightboxOpen(true);
+                              }}
+                            >
+                            <iframe
+                              src={convertGoogleDriveUrl(group.curriculum.pdfUrl)}
+                              className="w-full h-full border-0 pointer-events-none"
+                              allow="autoplay"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-4">
+                                <Eye className="w-8 h-8 text-cyan-600" />
                               </div>
                             </div>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-12">
-                        <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                          No Curriculum Available
-                        </h3>
-                        <p className="text-slate-600">
-                          Curriculum for {group.label} will be available soon.
-                        </p>
-                      </div>
-                    )}
-                  </TabsContent>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="p-4 sm:p-6 bg-slate-50 flex flex-col sm:flex-row gap-3">
+                            <Button
+                              variant="outline"
+                              className="flex-1"
+                              onClick={() => handleViewDetails(group.curriculum!.pdfUrl)}
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              View Full Details
+                            </Button>
+                            <Button
+                              className="flex-1 bg-cyan-600 hover:bg-cyan-700"
+                              onClick={() => handleDownload(group.curriculum!.pdfUrl)}
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              Download PDF
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                      ) : (
+                        <div className="text-center py-12">
+                          <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                          <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                            No Curriculum Available
+                          </h3>
+                          <p className="text-slate-600">
+                            Curriculum for {group.label} will be available soon.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )
                 ))}
-              </Tabs>
+              </>
             )}
           </CardContent>
         </Card>
@@ -350,6 +367,28 @@ export default function CurriculumPage() {
           </Card>
         </div>
       </section>
+
+      {/* PDF Lightbox */}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-full max-h-full w-screen h-screen p-0 border-0 m-0">
+          <div className="relative w-full h-screen bg-black">
+            <button
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-4 right-4 z-50 bg-white/90 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg transition-all hover:scale-110"
+              aria-label="Close"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            {lightboxPdfUrl && (
+              <iframe
+                src={convertGoogleDriveUrl(lightboxPdfUrl)}
+                className="w-full h-full border-0"
+                allow="autoplay"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
