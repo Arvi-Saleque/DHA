@@ -1,10 +1,11 @@
 "use client";
 
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, Navigation } from 'swiper/modules';
+import { Pagination, Navigation, Zoom } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+import 'swiper/css/zoom';
 
 interface MobilePDFViewerProps {
   pdfUrl: string;
@@ -43,33 +44,33 @@ export default function MobilePDFViewer({ pdfUrl, totalPages = 15 }: MobilePDFVi
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <div className="w-full min-h-screen flex flex-col">
-      <div className="flex-1 bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+    <div className="w-full h-screen flex flex-col bg-gray-100 dark:bg-slate-900">
+      <div className="flex-1 overflow-hidden">
         <Swiper
-          modules={[Pagination, Navigation]}
+          modules={[Pagination, Navigation, Zoom]}
           spaceBetween={0}
           slidesPerView={1}
           navigation
           pagination={{ clickable: true }}
-          className="h-[calc(100vh-8rem)] w-full"
+          zoom={{
+            maxRatio: 3,
+            minRatio: 1,
+          }}
+          className="h-full w-full"
         >
           {pages.map((page) => (
-            <SwiperSlide key={page} className="bg-gray-100 dark:bg-slate-900 flex items-center justify-center">
-              {/* Cloudinary URL magic: Converts PDF page -> High-quality image */}
-              <img 
-                src={`https://res.cloudinary.com/${cloudName}/image/upload/w_1600,q_auto:best,f_auto/pg_${page}/${publicId}.jpg`}
-                alt={`Page ${page}`}
-                className="w-full h-full object-contain"
-                loading={page <= 2 ? "eager" : "lazy"}
-              />
+            <SwiperSlide key={page} className="flex items-center justify-center">
+              <div className="swiper-zoom-container">
+                <img 
+                  src={`https://res.cloudinary.com/${cloudName}/image/upload/w_2000,q_auto:best,f_auto/pg_${page}/${publicId}.jpg`}
+                  alt={`Page ${page}`}
+                  className="w-full h-full object-contain"
+                  loading={page <= 2 ? "eager" : "lazy"}
+                />
+              </div>
             </SwiperSlide>
           ))}
         </Swiper>
-      </div>
-      <div className="bg-white dark:bg-slate-800 py-4 border-t border-gray-200 dark:border-slate-700">
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-          Swipe to turn pages • {totalPages} pages total
-        </p>
       </div>
     </div>
   );

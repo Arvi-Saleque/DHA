@@ -100,7 +100,7 @@ export default function CurriculumPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
-      <section className="mb-20 relative h-[300px] sm:h-[350px] md:h-[400px] bg-cyan-600 overflow-hidden">
+      <section className="hidden md:block mb-20 relative h-[300px] sm:h-[350px] md:h-[400px] bg-cyan-600 overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20"></div>
 
         <div className="relative container mx-auto px-4 h-full flex flex-col justify-center items-center text-white text-center">
@@ -132,7 +132,7 @@ export default function CurriculumPage() {
       </section>
 
       {/* Curriculum Highlights */}
-      <section className="container mx-auto px-4 mb-12">
+      <section className="hidden md:block container mx-auto px-4 mb-12">
         <div className="text-center mb-8">
           <Badge variant="outline" className="mb-4">
             <Target className="w-3 h-3 mr-1" />
@@ -187,9 +187,9 @@ export default function CurriculumPage() {
       </section>
 
       {/* Main Content - Curriculum by Category */}
-      <section className="container mx-auto px-4 pb-20">
-        <Card className="border-none shadow-xl">
-          <CardHeader className="border-b bg-slate-50/50">
+      <section className="container mx-auto px-0 md:px-4 pb-0 md:pb-20 pt-0">
+        <Card className="border-none shadow-none md:shadow-xl">
+          <CardHeader className="hidden md:block border-b bg-slate-50/50 px-4">
             <CardTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
               <FileText className="w-6 h-6 text-cyan-600" />
               Curriculum by Category
@@ -199,7 +199,7 @@ export default function CurriculumPage() {
             </p>
           </CardHeader>
 
-          <CardContent className="p-6">
+          <CardContent className="p-0 md:p-6">
             {loading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto"></div>
@@ -211,7 +211,7 @@ export default function CurriculumPage() {
                 onValueChange={setSelectedCategory}
                 className="w-full"
               >
-                <TabsList className="grid w-full grid-cols-3 gap-2 bg-slate-100 p-2 rounded-xl mb-8 h-auto">
+                <TabsList className="grid w-full grid-cols-3 gap-2 bg-slate-100 p-2 rounded-none md:rounded-xl mb-0 md:mb-8 h-auto">
                   {categoryGroups.map((group) => (
                     <TabsTrigger
                       key={group.id}
@@ -227,10 +227,10 @@ export default function CurriculumPage() {
                   <TabsContent
                     key={group.id}
                     value={group.label}
-                    className="space-y-6"
+                    className="m-0 p-0"
                   >
                     {group.curriculum ? (
-                      <Card className="border-2 hover:border-cyan-300 transition-all overflow-hidden">
+                      <div className="relative">
                         <div className="relative">
                           {/* Mobile-Optimized PDF Viewer */}
                           <MobilePDFViewer
@@ -239,7 +239,7 @@ export default function CurriculumPage() {
                           />
 
                           {/* Action Buttons */}
-                          <div className="p-6 bg-slate-50 flex gap-3">
+                          <div className="hidden md:flex p-6 bg-slate-50 gap-3">
                             <Button
                               variant="outline"
                               className="flex-1"
@@ -257,7 +257,7 @@ export default function CurriculumPage() {
                             </Button>
                           </div>
                         </div>
-                      </Card>
+                      </div>
                     ) : (
                       <div className="text-center py-12">
                         <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
@@ -277,7 +277,7 @@ export default function CurriculumPage() {
         </Card>
 
         {/* Additional Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
           <Card className="border-l-4 border-l-cyan-500">
             <CardContent className="p-6">
               <div className="flex items-start gap-3">
