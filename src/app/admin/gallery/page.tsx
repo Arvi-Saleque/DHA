@@ -352,7 +352,14 @@ export default function GalleryAdminPage() {
                       <Calendar className="w-3 h-3" />
                       {new Date(item.date).toLocaleDateString()}
                     </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-3 h-3" />
+                      {item.location}
+                    </div>
                   </div>
+                  <p className="text-xs text-slate-600 line-clamp-2 mb-3">
+                    {item.description}
+                  </p>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"

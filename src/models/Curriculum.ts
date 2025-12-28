@@ -11,6 +11,10 @@ const CurriculumSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  totalPages: {
+    type: Number,
+    default: 15,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

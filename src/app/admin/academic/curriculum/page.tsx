@@ -30,6 +30,7 @@ export default function CurriculumManagement() {
   const [formData, setFormData] = useState({
     category: '',
     pdfUrl: '',
+    totalPages: 15,
   });
 
   useEffect(() => {
@@ -60,6 +61,7 @@ export default function CurriculumManagement() {
     const curriculumData = {
       category: formData.category,
       pdfUrl: formData.pdfUrl,
+      totalPages: formData.totalPages,
     };
 
     try {
@@ -90,6 +92,7 @@ export default function CurriculumManagement() {
     setFormData({
       category: curriculum.category,
       pdfUrl: curriculum.pdfUrl,
+      totalPages: curriculum.totalPages || 15,
     });
     setIsDialogOpen(true);
   };
@@ -109,6 +112,7 @@ export default function CurriculumManagement() {
     setFormData({
       category: '',
       pdfUrl: '',
+      totalPages: 15,
     });
     setEditingCurriculum(null);
   };
@@ -164,6 +168,24 @@ export default function CurriculumManagement() {
                   onChange={(url) => setFormData({ ...formData, pdfUrl: url })}
                   folder="curriculum"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Total Pages
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={formData.totalPages}
+                  onChange={(e) => setFormData({ ...formData, totalPages: parseInt(e.target.value) || 15 })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="Enter total number of pages"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Number of pages in the PDF (required for flipbook viewer)
+                </p>
               </div>
 
               <div className="flex justify-end gap-2">
