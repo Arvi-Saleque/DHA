@@ -7,7 +7,7 @@ export async function POST() {
     await connectDB();
     
     // Drop the curriculums collection
-    await mongoose.connection.db.dropCollection("curricula");
+    await mongoose.connection.db?.dropCollection("curricula");
     
     return NextResponse.json({
       success: true,
