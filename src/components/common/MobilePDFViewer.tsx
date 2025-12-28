@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FileText, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 
 interface MobilePDFViewerProps {
   pdfUrl: string;
@@ -14,6 +14,9 @@ export default function MobilePDFViewer({ pdfUrl }: MobilePDFViewerProps) {
   const [isClient, setIsClient] = useState(false);
   const [Document, setDocument] = useState<any>(null);
   const [Page, setPage] = useState<any>(null);
+  const [scale, setScale] = useState<number>(1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [touchStart, setTouchStart] = useState<number>(0);
 
   useEffect(() => {
     setIsClient(true);
@@ -37,6 +40,46 @@ export default function MobilePDFViewer({ pdfUrl }: MobilePDFViewerProps) {
     loadPdfComponents();
   }, []);
 
+  // Handle pinch-to-zoom
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let initialDistance = 0;
+    let initialScale = scale;
+
+    const getDistance = (touches: TouchList) => {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        initialDistance = getDistance(e.touches);
+        initialScale = scale;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const currentDistance = getDistance(e.touches);
+        const newScale = initialScale * (currentDistance / initialDistance);
+        setScale(Math.min(Math.max(newScale, 0.5), 3));
+      }
+    };
+
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [scale]);
+
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
   };
@@ -49,6 +92,18 @@ export default function MobilePDFViewer({ pdfUrl }: MobilePDFViewerProps) {
     setPageNumber((prev) => Math.min(prev + 1, numPages));
   };
 
+  const zoomIn = () => {
+    setScale((prev) => Math.min(prev + 0.25, 3));
+  };
+
+  const zoomOut = () => {
+    setScale((prev) => Math.max(prev - 0.25, 0.5));
+  };
+
+  const resetZoom = () => {
+    setScale(1);
+  };
+
   if (!isClient || !Document || !Page) {
     return (
       <div className="flex items-center justify-center py-20 bg-slate-100">
@@ -58,8 +113,46 @@ export default function MobilePDFViewer({ pdfUrl }: MobilePDFViewerProps) {
   }
 
   return (
-    <div className="relative overflow-hidden bg-slate-100">
-      <div className="w-full max-w-full overflow-x-auto">
+    <div className="relative bg-slate-100">
+      {/* Zoom Controls */}
+      <div className="sticky top-0 z-10 bg-slate-800 text-white px-4 py-2 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={zoomOut}
+            disabled={scale <= 0.5}
+            variant="ghost"
+            size="sm"
+            className="text-white hover:bg-slate-700 disabled:opacity-50"
+          >
+            <ZoomOut className="w-4 h-4" />
+          </Button>
+          <span className="text-xs font-mono">{Math.round(scale * 100)}%</span>
+          <Button
+            onClick={zoomIn}
+            disabled={scale >= 3}
+            variant="ghost"
+            size="sm"
+            className="text-white hover:bg-slate-700 disabled:opacity-50"
+          >
+            <ZoomIn className="w-4 h-4" />
+          </Button>
+        </div>
+        <Button
+          onClick={resetZoom}
+          variant="ghost"
+          size="sm"
+          className="text-white hover:bg-slate-700"
+        >
+          <Maximize2 className="w-4 h-4 mr-1" />
+          Reset
+        </Button>
+      </div>
+
+      <div 
+        ref={containerRef}
+        className="w-full overflow-auto touch-pan-x touch-pan-y"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
         <Document
           file={pdfUrl}
           onLoadSuccess={onDocumentLoadSuccess}
@@ -77,7 +170,8 @@ export default function MobilePDFViewer({ pdfUrl }: MobilePDFViewerProps) {
         >
           <Page
             pageNumber={pageNumber}
-            width={window.innerWidth - 32}
+            width={(window.innerWidth - 32) * scale}
+            scale={scale}
             renderTextLayer={false}
             renderAnnotationLayer={false}
           />
@@ -86,7 +180,7 @@ export default function MobilePDFViewer({ pdfUrl }: MobilePDFViewerProps) {
 
       {/* Page Navigation */}
       {numPages > 1 && (
-        <div className="bg-slate-800 text-white px-4 py-3 flex items-center justify-between">
+        <div className="sticky bottom-0 bg-slate-800 text-white px-4 py-3 flex items-center justify-between">
           <Button
             onClick={goToPrevPage}
             disabled={pageNumber <= 1}
