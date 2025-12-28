@@ -239,17 +239,9 @@ export default function CurriculumPage() {
                           />
 
                           {/* Action Buttons */}
-                          <div className="p-6 bg-slate-50 flex gap-3">
+                          <div className="p-6 bg-slate-50 flex justify-center">
                             <Button
-                              variant="outline"
-                              className="flex-1"
-                              onClick={() => handleViewDetails(group.curriculum!.pdfUrl)}
-                            >
-                              <Eye className="w-4 h-4 mr-2" />
-                              View Full Details
-                            </Button>
-                            <Button
-                              className="flex-1 bg-cyan-600 hover:bg-cyan-700"
+                              className="bg-cyan-600 hover:bg-cyan-700"
                               onClick={() => handleDownload(group.curriculum!.pdfUrl)}
                             >
                               <Download className="w-4 h-4 mr-2" />
