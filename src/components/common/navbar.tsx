@@ -13,6 +13,7 @@ import {
   Newspaper,
   Phone,
   Image as ImageIcon,
+  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -154,8 +155,16 @@ export default function Navbar() {
               </React.Fragment>
             ))}
             
+            {/* Give Review Button */}
+            <Button variant="outline" asChild className="ml-2">
+              <Link href="/reviews" className="gap-2">
+                <Star className="h-4 w-4" />
+                Give Review
+              </Link>
+            </Button>
+            
             {/* Enroll Now Button */}
-            <Button asChild className="ml-4 bg-cyan-600 hover:bg-cyan-700">
+            <Button asChild className="ml-2 bg-cyan-600 hover:bg-cyan-700">
               <Link href="/admission">
                 Enroll Now
               </Link>
@@ -164,6 +173,14 @@ export default function Navbar() {
 
           {/* Mobile Menu */}
           <div className="flex items-center gap-2">
+            {/* Mobile Review Button */}
+            <Button asChild size="sm" variant="outline" className="md:hidden">
+              <Link href="/reviews" className="gap-1">
+                <Star className="h-3 w-3" />
+                Review
+              </Link>
+            </Button>
+            
             {/* Mobile Enroll Button */}
             <Button asChild size="sm" className="bg-cyan-600 hover:bg-cyan-700 md:hidden">
               <Link href="/admission">

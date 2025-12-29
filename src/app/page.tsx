@@ -28,6 +28,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
+  UserCircle2,
 } from "lucide-react";
 
 export default function Home() {
@@ -37,6 +38,7 @@ export default function Home() {
     name: string;
     relation: string;
     image: string;
+    gender?: string;
     rating: number;
     review: string;
     order: number;
@@ -521,11 +523,21 @@ export default function Home() {
                                       <div className="relative flex-shrink-0">
                                         <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full animate-pulse opacity-20"></div>
                                         <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-4 border-white shadow-xl ring-4 ring-cyan-100">
-                                          <img
-                                            src={review.image}
-                                            alt={review.name}
-                                            className="w-full h-full object-cover"
-                                          />
+                                          {review.image ? (
+                                            <img
+                                              src={review.image}
+                                              alt={review.name}
+                                              className="w-full h-full object-cover"
+                                            />
+                                          ) : (
+                                            <div className={`w-full h-full flex items-center justify-center ${
+                                              review.gender === "female" ? "bg-pink-100" : "bg-blue-100"
+                                            }`}>
+                                              <UserCircle2 className={`w-16 h-16 sm:w-20 sm:h-20 ${
+                                                review.gender === "female" ? "text-pink-400" : "text-blue-400"
+                                              }`} />
+                                            </div>
+                                          )}
                                         </div>
                                         {/* Verified Badge */}
                                         <div className="absolute -bottom-1 -right-1 w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center border-2 border-white shadow-lg">

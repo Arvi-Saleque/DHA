@@ -2,10 +2,17 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Review from "@/models/Review";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await connectDB();
-    const reviews = await Review.find({ isActive: true }).sort({ order: 1 });
+    
+    // Check if this is an admin request
+    const { searchParams } = new URL(request.url);
+    const isAdmin = searchParams.get('admin') === 'true';
+    
+    // For admin, fetch all reviews; for public, only active reviews
+    const query = isAdmin ? {} : { isActive: true };
+    const reviews = await Review.find(query).sort({ order: 1 });
     
     // Calculate rating distribution
     const ratingDistribution = {
