@@ -149,14 +149,21 @@ export default function AssignmentsPage() {
             </div>
           </CardHeader>
 
-          <CardContent className="p-0">
+          <CardContent className="p-6">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-cyan-600" />
               </div>
+            ) : filteredAssignments.length === 0 ? (
+              <div className="text-center py-12">
+                <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-500">
+                  No assignments found matching your filters
+                </p>
+              </div>
             ) : (
-              <div className="overflow-x-auto -mx-4 sm:mx-0">
-                <Table className="min-w-[800px]">
+              <div className="overflow-x-auto">
+                <Table>
                   <TableHeader>
                     <TableRow className="bg-slate-50 hover:bg-slate-50">
                       <TableHead className="font-bold text-slate-900">
@@ -180,60 +187,49 @@ export default function AssignmentsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredAssignments.length > 0 ? (
-                      filteredAssignments.map((assignment) => (
-                        <TableRow
-                          key={assignment._id}
-                          className="hover:bg-slate-50"
-                        >
-                          <TableCell>
-                            <Badge variant="outline" className="font-normal">
-                              {assignment.class}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {assignment.subject}
-                          </TableCell>
-                          <TableCell className="max-w-xs">
-                            <div className="font-medium text-slate-900">
-                              {assignment.title}
-                            </div>
-                          </TableCell>
-                          <TableCell className="max-w-md">
-                            <div className="text-sm text-slate-600 line-clamp-2">
-                              {assignment.description || "No instructions"}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2 text-sm">
-                              <Clock className="w-4 h-4 text-slate-400" />
-                              {new Date(assignment.deadline).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                }
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-sm">
-                              {assignment.teacherName}
-                            </span>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-center py-12">
-                          <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                          <p className="text-slate-500">
-                            No assignments found matching your filters
-                          </p>
+                    {filteredAssignments.map((assignment) => (
+                      <TableRow
+                        key={assignment._id}
+                        className="hover:bg-slate-50"
+                      >
+                        <TableCell>
+                          <Badge variant="outline" className="font-normal">
+                            {assignment.class}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {assignment.subject}
+                        </TableCell>
+                        <TableCell className="max-w-xs">
+                          <div className="font-medium text-slate-900">
+                            {assignment.title}
+                          </div>
+                        </TableCell>
+                        <TableCell className="max-w-md">
+                          <div className="text-sm text-slate-600 line-clamp-2">
+                            {assignment.description || "No instructions"}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 text-sm">
+                            <Clock className="w-4 h-4 text-slate-400" />
+                            {new Date(assignment.deadline).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              }
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm">
+                            {assignment.teacherName}
+                          </span>
                         </TableCell>
                       </TableRow>
-                    )}
+                    ))}
                   </TableBody>
                 </Table>
               </div>
