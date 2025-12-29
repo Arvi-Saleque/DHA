@@ -43,6 +43,11 @@ export default function Home() {
     isActive: boolean;
   }>>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
+  const [reviewStats, setReviewStats] = useState<{
+    ratingDistribution: { 5: number; 4: number; 3: number; 2: number; 1: number };
+    totalReviews: number;
+    averageRating: string;
+  } | null>(null);
   const [reviewSettings, setReviewSettings] = useState({
     trustedByText: "Trusted by",
     familiesCount: "500+ Families",
@@ -139,7 +144,10 @@ export default function Home() {
       const response = await fetch("/api/reviews");
       if (response.ok) {
         const data = await response.json();
-        setReviews(data);
+        setReviews(data.reviews || data);
+        if (data.stats) {
+          setReviewStats(data.stats);
+        }
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
@@ -637,27 +645,56 @@ export default function Home() {
                   )}
                 </div>
 
-              {/* Trust Badge */}
-              <div className="mt-12 sm:mt-16 flex justify-center gap-4 sm:gap-6 flex-wrap">
-                <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-white rounded-2xl shadow-lg border-2 border-cyan-100 hover:shadow-xl transition-shadow">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs sm:text-sm text-slate-500 font-medium">{reviewSettings.trustedByText}</p>
-                    <p className="text-lg sm:text-xl font-bold text-slate-900">{reviewSettings.familiesCount}</p>
-                  </div>
+              {/* Rating Distribution */}
+              {reviewStats && (
+                <div className="mt-12 sm:mt-16 max-w-2xl mx-auto">
+                  <Card className="border-2 border-cyan-100 shadow-xl">
+                    <CardContent className="p-6 sm:p-8">
+                      <div className="text-center mb-6">
+                        <h3 className="text-2xl font-bold text-slate-900 mb-2">Rating Distribution</h3>
+                        <p className="text-slate-600">{reviewStats.totalReviews} Total Reviews from Families</p>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {[5, 4, 3, 2, 1].map((stars) => {
+                          const count = reviewStats.ratingDistribution[stars as keyof typeof reviewStats.ratingDistribution];
+                          const percentage = reviewStats.totalReviews > 0 ? (count / reviewStats.totalReviews) * 100 : 0;
+                          
+                          return (
+                            <div key={stars} className="flex items-center gap-3">
+                              <div className="flex items-center gap-1 w-20">
+                                <span className="text-sm font-semibold text-slate-700">{stars}</span>
+                                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                              </div>
+                              <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500 flex items-center justify-end pr-2"
+                                  style={{ width: `${percentage}%` }}
+                                >
+                                  {count > 0 && (
+                                    <span className="text-xs font-semibold text-white">{count}</span>
+                                  )}
+                                </div>
+                              </div>
+                              <span className="text-sm font-medium text-slate-600 w-12 text-right">{percentage.toFixed(0)}%</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      <div className="mt-6 pt-6 border-t border-slate-200 text-center">
+                        <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200">
+                          <Star className="w-6 h-6 fill-amber-400 text-amber-400" />
+                          <div className="text-left">
+                            <p className="text-xs text-slate-500 font-medium">Average Rating</p>
+                            <p className="text-2xl font-bold text-slate-900">{reviewStats.averageRating}/5.0</p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-                <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-white rounded-2xl shadow-lg border-2 border-cyan-100 hover:shadow-xl transition-shadow">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
-                    <Star className="w-5 h-5 sm:w-6 sm:h-6 fill-white text-white" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs sm:text-sm text-slate-500 font-medium">{reviewSettings.averageRatingText}</p>
-                    <p className="text-lg sm:text-xl font-bold text-slate-900">{reviewSettings.averageRatingValue}</p>
-                  </div>
-                </div>
-              </div>
+              )}
             </>
           ) : null}
         </div>

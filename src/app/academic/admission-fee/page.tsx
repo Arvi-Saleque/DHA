@@ -27,8 +27,8 @@ interface AdmissionFee {
   className: string;
   admissionFee: number;
   tuitionFee: number;
+  dinningFee: number;
   examFee: number;
-  otherFees: number;
 }
 
 export default function AdmissionFeePage() {
@@ -50,50 +50,6 @@ export default function AdmissionFeePage() {
       setLoading(false);
     }
   };
-
-  const calculateMonthlyTotal = (fee: AdmissionFee) => {
-    return fee.tuitionFee + fee.examFee + fee.otherFees;
-  };
-
-  const calculateAnnualTotal = (fee: AdmissionFee) => {
-    const monthlyTotal = calculateMonthlyTotal(fee);
-    return fee.admissionFee + (monthlyTotal * 12);
-  };
-
-  const totalAdmissionFees = fees.reduce((sum, fee) => sum + fee.admissionFee, 0);
-  const averageMonthlyFee = fees.length > 0
-    ? fees.reduce((sum, fee) => sum + calculateMonthlyTotal(fee), 0) / fees.length
-    : 0;
-  const averageAnnualFee = fees.length > 0
-    ? fees.reduce((sum, fee) => sum + calculateAnnualTotal(fee), 0) / fees.length
-    : 0;
-
-  const stats = [
-    {
-      icon: GraduationCap,
-      value: fees.length.toString(),
-      label: "Classes",
-      color: "text-cyan-600",
-    },
-    {
-      icon: DollarSign,
-      value: `₨${Math.round(totalAdmissionFees / fees.length || 0).toLocaleString()}`,
-      label: "Avg Admission",
-      color: "text-green-600",
-    },
-    {
-      icon: FileText,
-      value: `₨${Math.round(averageMonthlyFee).toLocaleString()}`,
-      label: "Avg Monthly",
-      color: "text-blue-600",
-    },
-    {
-      icon: CheckCircle2,
-      value: `₨${Math.round(averageAnnualFee).toLocaleString()}`,
-      label: "Avg Annual",
-      color: "text-purple-600",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -164,22 +120,16 @@ export default function AdmissionFeePage() {
                     <TableRow className="bg-slate-50">
                       <TableHead className="font-bold">Class</TableHead>
                       <TableHead className="font-bold text-right">
-                        Admission Fee
+                        Admission Fee (Yearly)
                       </TableHead>
                       <TableHead className="font-bold text-right">
                         Tuition Fee (Monthly)
                       </TableHead>
                       <TableHead className="font-bold text-right">
-                        Exam Fee (Monthly)
+                        Dinning Fee (Monthly)
                       </TableHead>
                       <TableHead className="font-bold text-right">
-                        Other Fees (Monthly)
-                      </TableHead>
-                      <TableHead className="font-bold text-right">
-                        Monthly Total
-                      </TableHead>
-                      <TableHead className="font-bold text-cyan-600 text-right">
-                        Annual Total
+                        Exam Fee (Semester)
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -189,23 +139,17 @@ export default function AdmissionFeePage() {
                         <TableCell className="font-semibold">
                           {fee.className}
                         </TableCell>
-                        <TableCell className="text-right font-medium">
-                          ₨{fee.admissionFee.toLocaleString()}
+                        <TableCell className="text-right font-medium text-cyan-600">
+                          <span className="text-xl">৳</span>{fee.admissionFee?.toLocaleString() || '0'}
                         </TableCell>
-                        <TableCell className="text-right">
-                          ₨{fee.tuitionFee.toLocaleString()}
+                        <TableCell className="text-right font-medium text-green-600">
+                          <span className="text-xl">৳</span>{fee.tuitionFee?.toLocaleString() || '0'}
                         </TableCell>
-                        <TableCell className="text-right">
-                          ₨{fee.examFee.toLocaleString()}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          ₨{fee.otherFees.toLocaleString()}
+                        <TableCell className="text-right font-medium text-orange-600">
+                          <span className="text-xl">৳</span>{fee.dinningFee?.toLocaleString() || '0'}
                         </TableCell>
                         <TableCell className="text-right font-medium text-blue-600">
-                          ₨{calculateMonthlyTotal(fee).toLocaleString()}
-                        </TableCell>
-                        <TableCell className="text-right font-bold text-cyan-600">
-                          ₨{calculateAnnualTotal(fee).toLocaleString()}
+                          <span className="text-xl">৳</span>{fee.examFee?.toLocaleString() || '0'}
                         </TableCell>
                       </TableRow>
                     ))}

@@ -61,6 +61,16 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     await connectDB();
+    
+    // Check if it's a delete all request
+    const body = await request.json().catch(() => null);
+    
+    if (body?.deleteAll === true) {
+      await ClassRoutine.deleteMany({});
+      return NextResponse.json({ message: 'All class routines deleted successfully' });
+    }
+    
+    // Otherwise, delete single item by ID
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     

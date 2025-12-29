@@ -8,7 +8,7 @@ export async function GET() {
   try {
     await connectDB();
     const results = await ExamResult.find({ isActive: true })
-      .sort({ publishedDate: -1, className: 1 });
+      .sort({ className: 1, examName: 1 });
     return NextResponse.json(results);
   } catch (error) {
     console.error('Error fetching exam results:', error);
@@ -25,9 +25,9 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const body = await request.json();
     
-    const { className, examName, examType, publishedDate, pdfUrl, passPercentage } = body;
+    const { className, examName, pdfUrl, totalPages, passPercentage } = body;
     
-    if (!className || !examName || !examType || !publishedDate || !pdfUrl || passPercentage === undefined) {
+    if (!className || !examName || !pdfUrl || passPercentage === undefined) {
       return NextResponse.json(
         { error: 'All fields are required' },
         { status: 400 }
@@ -44,9 +44,8 @@ export async function POST(request: NextRequest) {
     const result = await ExamResult.create({
       className,
       examName,
-      examType,
-      publishedDate,
       pdfUrl,
+      totalPages: totalPages || 15,
       passPercentage,
       isActive: true
     });
@@ -75,7 +74,7 @@ export async function PUT(request: NextRequest) {
     await connectDB();
     const body = await request.json();
     
-    const { id, className, examName, examType, publishedDate, pdfUrl, passPercentage } = body;
+    const { id, className, examName, pdfUrl, totalPages, passPercentage } = body;
     
     if (!id) {
       return NextResponse.json(
@@ -93,7 +92,7 @@ export async function PUT(request: NextRequest) {
 
     const result = await ExamResult.findByIdAndUpdate(
       id,
-      { className, examName, examType, publishedDate, pdfUrl, passPercentage },
+      { className, examName, pdfUrl, totalPages, passPercentage },
       { new: true, runValidators: true }
     );
 

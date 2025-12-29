@@ -13,11 +13,19 @@ const SyllabusSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  totalPages: {
+    type: Number,
+    default: 15,
+  },
   isActive: {
     type: Boolean,
     default: true,
   },
   createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
     type: Date,
     default: Date.now,
   },

@@ -10,18 +10,13 @@ const examResultSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  examType: {
-    type: String,
-    required: true,
-    enum: ['Midterm', 'Final', 'Terminal']
-  },
-  publishedDate: {
-    type: Date,
-    required: true
-  },
   pdfUrl: {
     type: String,
     required: true
+  },
+  totalPages: {
+    type: Number,
+    default: 15
   },
   passPercentage: {
     type: Number,

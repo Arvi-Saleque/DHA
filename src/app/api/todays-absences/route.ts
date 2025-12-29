@@ -25,9 +25,9 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { className, section, title, imageUrl } = body;
+    const { className, absenceName, pdfUrl, totalPages } = body;
 
-    if (!className || !section || !title || !imageUrl) {
+    if (!className || !absenceName || !pdfUrl) {
       return NextResponse.json(
         { error: 'All fields are required' },
         { status: 400 }
@@ -36,16 +36,16 @@ export async function POST(req: NextRequest) {
 
     const absence = await TodaysAbsence.create({
       className,
-      section,
-      title,
-      imageUrl,
+      absenceName,
+      pdfUrl,
+      totalPages: totalPages || 15,
     }) as any;
     
     // Send automatic notification to subscribers
     await sendAutomaticNotification({
       type: 'academic',
       title: 'Absence Report Published',
-      message: `${title} - Absence report for ${className} ${section}.`,
+      message: `${absenceName} - Absence report for ${className} has been published.`,
       link: `/absences`
     });
 
@@ -67,7 +67,7 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { id, className, section, title, imageUrl } = body;
+    const { id, className, absenceName, pdfUrl, totalPages } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -78,8 +78,8 @@ export async function PUT(req: NextRequest) {
 
     const absence = await TodaysAbsence.findByIdAndUpdate(
       id,
-      { className, section, title, imageUrl },
-      { new: true }
+      { className, absenceName, pdfUrl, totalPages },
+      { new: true, runValidators: true }
     );
 
     if (!absence) {

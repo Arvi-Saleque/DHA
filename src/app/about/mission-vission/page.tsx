@@ -124,37 +124,40 @@ export default function MissionVisionPage() {
     }
   };
 
-  // Default fallback data
-  const defaultData: MissionVisionData = {
-    missionTitle: "Our Mission",
-    missionDescription: "To provide comprehensive Islamic education that combines traditional scholarship with modern pedagogy, fostering intellectual growth, spiritual development, and moral excellence in our students.",
-    missionImageUrl: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&h=400&fit=crop",
-    missionPoints: [
-      { icon: "BookOpen", title: "Quality Islamic Education", description: "Deliver comprehensive Islamic studies with modern pedagogy" },
-      { icon: "Heart", title: "Character Development", description: "Nurture strong Islamic values and moral excellence" },
-      { icon: "Users", title: "Global Citizens", description: "Prepare students for success in a diverse world" },
-      { icon: "Lightbulb", title: "Research & Innovation", description: "Promote scholarly work and intellectual growth" },
-    ],
-    visionTitle: "Our Vision",
-    visionDescription: "To be a leading institution of Islamic education that produces well-rounded individuals who excel in both religious knowledge and worldly pursuits, contributing positively to society.",
-    visionImageUrl: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&h=400&fit=crop",
-    visionPoints: [
-      { icon: "Award", title: "Center of Excellence", description: "Leading institution in Islamic education" },
-      { icon: "TrendingUp", title: "Academic Achievement", description: "Recognized for spiritual and academic success" },
-      { icon: "Users", title: "Future Leaders", description: "Producing scholars and community leaders" },
-      { icon: "Heart", title: "Interfaith Dialogue", description: "Fostering understanding and harmony" },
-    ],
-    coreValues: [
-      { name: "Faith", color: "bg-cyan-500" },
-      { name: "Excellence", color: "bg-blue-500" },
-      { name: "Integrity", color: "bg-purple-500" },
-      { name: "Compassion", color: "bg-pink-500" },
-      { name: "Knowledge", color: "bg-indigo-500" },
-      { name: "Service", color: "bg-teal-500" },
-    ],
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-cyan-600 mx-auto mb-4"></div>
+          <p className="text-slate-600 text-lg">Loading Mission & Vision...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const data = missionVisionData || defaultData;
+  if (!missionVisionData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+        <div className="text-center px-4">
+          <Target className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            No Mission & Vision Available
+          </h3>
+          <p className="text-slate-600 mb-6">
+            The mission and vision content has not been set up yet.
+          </p>
+          <Link href="/about">
+            <Button className="bg-cyan-600 hover:bg-cyan-700">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to About
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const data = missionVisionData;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">

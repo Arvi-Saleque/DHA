@@ -20,11 +20,11 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
     const body = await request.json();
-    const { className, admissionFee, tuitionFee, examFee, otherFees } = body;
+    const { className, admissionFee, tuitionFee, dinningFee, examFee } = body;
 
-    if (!className || !admissionFee || !tuitionFee || !examFee) {
+    if (!className || !admissionFee || !tuitionFee || !dinningFee || !examFee) {
       return NextResponse.json(
-        { error: 'Class name, admission fee, tuition fee, and exam fee are required' },
+        { error: 'All fee fields are required' },
         { status: 400 }
       );
     }
@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
       className,
       admissionFee,
       tuitionFee,
+      dinningFee,
       examFee,
-      otherFees: otherFees || 0,
       isActive: true,
     }) as any;
     
@@ -58,7 +58,7 @@ export async function PUT(request: NextRequest) {
   try {
     await connectDB();
     const body = await request.json();
-    const { _id, className, admissionFee, tuitionFee, examFee, otherFees } = body;
+    const { _id, className, admissionFee, tuitionFee, dinningFee, examFee } = body;
 
     if (!_id) {
       return NextResponse.json({ error: 'Fee ID is required' }, { status: 400 });
@@ -66,8 +66,8 @@ export async function PUT(request: NextRequest) {
 
     const fee = await AdmissionFee.findByIdAndUpdate(
       _id,
-      { className, admissionFee, tuitionFee, examFee, otherFees },
-      { new: true }
+      { className, admissionFee, tuitionFee, dinningFee, examFee },
+      { new: true, runValidators: true }
     );
 
     if (!fee) {

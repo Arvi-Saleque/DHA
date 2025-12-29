@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   BookOpen,
   Download,
@@ -17,12 +18,14 @@ import {
   Award,
   List,
 } from "lucide-react";
+import MobilePDFViewer from "@/components/common/MobilePDFViewer";
 
 interface Syllabus {
   _id: string;
   className: string;
   subject: string;
   pdfUrl: string;
+  totalPages?: number;
   isActive: boolean;
 }
 
@@ -39,6 +42,7 @@ export default function SyllabusPage() {
   const [syllabuses, setSyllabuses] = useState<Syllabus[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedClass, setSelectedClass] = useState("Play Group");
+  const [viewingSyllabus, setViewingSyllabus] = useState<Syllabus | null>(null);
 
   const classes = ['Play Group', 'Nursery', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7'];
 
@@ -65,10 +69,26 @@ export default function SyllabusPage() {
     }
   };
 
-  const handleDownload = (pdfUrl: string) => {
-    const match = pdfUrl.match(/\/file\/d\/([^\/]+)/);
-    if (match && match[1]) {
-      window.open(`https://drive.google.com/uc?export=download&id=${match[1]}`, '_blank');
+  const handleDownload = async (pdfUrl: string) => {
+    try {
+      const match = pdfUrl.match(/\/file\/d\/([^\/]+)/);
+      if (match && match[1]) {
+        window.open(`https://drive.google.com/uc?export=download&id=${match[1]}`, '_blank');
+      } else {
+        const response = await fetch(pdfUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `syllabus-${Date.now()}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+      window.open(pdfUrl, '_blank');
     }
   };
 
@@ -95,11 +115,20 @@ export default function SyllabusPage() {
     },
   ];
 
-  const classGroups = classes.map(cls => ({
-    id: cls.toLowerCase().replace(' ', '-'),
-    label: cls,
-    syllabuses: syllabuses.filter((s) => s.className === cls),
-  }));
+  const classGroups = classes
+    .map(cls => ({
+      id: cls.toLowerCase().replace(' ', '-'),
+      label: cls,
+      syllabuses: syllabuses.filter((s) => s.className === cls),
+    }))
+    .filter(group => group.syllabuses.length > 0);
+
+  // Set the first available class when data loads
+  useEffect(() => {
+    if (classGroups.length > 0 && !selectedClass) {
+      setSelectedClass(classGroups[0].label);
+    }
+  }, [syllabuses, classGroups.length]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -135,41 +164,6 @@ export default function SyllabusPage() {
         </div>
       </section>
 
-      {/* Syllabus Features */}
-      <section className="container mx-auto px-4 mb-12">
-        <div className="text-center mb-8">
-          <Badge variant="outline" className="mb-4">
-            <Target className="w-3 h-3 mr-1" />
-            What's Included
-          </Badge>
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">
-            Syllabus Features
-          </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Comprehensive syllabus with detailed content and learning objectives
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {syllabusFeatures.map((item, index) => (
-            <Card
-              key={index}
-              className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 bg-gradient-to-br from-white to-slate-50"
-            >
-              <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <item.icon className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-slate-600">{item.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
       {/* Main Content - Syllabus by Class */}
       <section className="container mx-auto px-4 pb-20">
         <Card className="border-none shadow-xl">
@@ -189,96 +183,148 @@ export default function SyllabusPage() {
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto"></div>
                 <p className="text-slate-600 mt-4">Loading syllabuses...</p>
               </div>
-            ) : (
-              <Tabs
-                value={selectedClass}
-                onValueChange={setSelectedClass}
-                className="w-full"
-              >
-                <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2 bg-slate-100 p-2 rounded-xl mb-8 h-auto">
-                  {classGroups.map((group) => (
-                    <TabsTrigger
-                      key={group.id}
-                      value={group.label}
-                      className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white text-xs sm:text-sm py-2"
-                    >
-                      {group.label}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-
-                {classGroups.map((group) => (
-                  <TabsContent
-                    key={group.id}
-                    value={group.label}
-                    className="space-y-6"
+            ) : classGroups.length > 0 ? (
+              <div className="space-y-6">
+                {/* Class Selector Dropdown */}
+                <div className="mb-8 p-4 bg-slate-50 rounded-lg border max-w-md">
+                  <label className="text-sm font-semibold text-slate-700 flex items-center gap-2 mb-2">
+                    <GraduationCap className="w-4 h-4 text-cyan-600" />
+                    Filter by Class
+                  </label>
+                  <Select
+                    value={selectedClass}
+                    onValueChange={setSelectedClass}
                   >
-                    {group.syllabuses.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {group.syllabuses.map((syllabus) => (
-                          <Card
-                            key={syllabus._id}
-                            className="border-2 hover:border-cyan-300 transition-all overflow-hidden group"
-                          >
-                            {/* PDF Preview Section */}
-                            <div className="relative h-48 overflow-hidden bg-slate-100">
-                              <iframe
-                                src={convertGoogleDriveUrl(syllabus.pdfUrl)}
-                                className="w-full h-full border-0 pointer-events-none"
-                                allow="autoplay"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                              
-                              
-                            </div>
+                    <SelectTrigger className="w-full bg-white">
+                      <SelectValue placeholder="Select class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {classGroups.map((group) => (
+                        <SelectItem key={group.id} value={group.label}>
+                          {group.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                            {/* Content Section */}
-                            <CardContent className="p-6">
-                              <div className="mb-4">
-                                <Badge variant="outline" className="gap-1">
-                                  <GraduationCap className="w-3 h-3" />
-                                  {syllabus.subject}
-                                </Badge>
-                              </div>
+                {/* Display syllabuses for selected class */}
+                {classGroups
+                  .filter(group => group.label === selectedClass)
+                  .map((group) => (
+                  <div key={group.id}>
+                    {viewingSyllabus ? (
+                      /* PDF Viewer Mode */
+                      <div className="-mx-6 -mb-6">
+                        <div className="relative">
+                          {/* Back Button */}
+                          <div className="py-2 sm:py-3 bg-slate-100 px-3 sm:px-6 flex items-center justify-between">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
+                              onClick={() => setViewingSyllabus(null)}
+                            >
+                              <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                              <span className="hidden sm:inline">Back to List</span>
+                              <span className="sm:hidden">Back</span>
+                            </Button>
+                            <Badge variant="outline" className="gap-1 text-xs sm:text-sm">
+                              <GraduationCap className="w-3 h-3" />
+                              <span className="hidden sm:inline">{viewingSyllabus.subject}</span>
+                            </Badge>
+                          </div>
 
-                              {/* Action Buttons */}
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => handleViewDetails(syllabus.pdfUrl)}
-                                >
-                                  <Eye className="w-4 h-4 mr-1" />
-                                  View
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  className="flex-1 bg-cyan-600 hover:bg-cyan-700"
-                                  onClick={() => handleDownload(syllabus.pdfUrl)}
-                                >
-                                  <Download className="w-4 h-4 mr-1" />
-                                  PDF
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
+                          {/* Mobile-Optimized PDF Viewer */}
+                          <MobilePDFViewer
+                            pdfUrl={viewingSyllabus.pdfUrl}
+                            totalPages={viewingSyllabus.totalPages || 15}
+                          />
+
+                          {/* Action Buttons */}
+                          <div className="py-2 sm:py-3 bg-slate-50 flex justify-center">
+                            <Button
+                              className="bg-cyan-600 hover:bg-cyan-700 text-xs sm:text-sm px-3 sm:px-4 h-8 sm:h-10"
+                              onClick={() => handleDownload(viewingSyllabus.pdfUrl)}
+                            >
+                              <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                              Download PDF
+                            </Button>
+                          </div>
+                        </div>
                       </div>
-                    ) : (
-                      <div className="text-center py-12">
-                        <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                          No Syllabus Available
-                        </h3>
-                        <p className="text-slate-600">
-                          Syllabus for {group.label} will be available soon.
-                        </p>
+                    ) : group.syllabuses.length > 0 ? (
+                      /* Table View Mode */
+                      <div>
+                        <div className="mb-4">
+                          <p className="text-sm text-slate-600">
+                            Showing <strong>{group.syllabuses.length}</strong> syllabus{group.syllabuses.length !== 1 ? 'es' : ''} for {group.label}
+                          </p>
+                        </div>
+                        <div className="rounded-lg border border-slate-200 overflow-hidden">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="bg-slate-50">
+                                <TableHead className="font-semibold">Subject Name</TableHead>
+                                <TableHead className="text-right font-semibold">Actions</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {group.syllabuses.map((syllabus) => (
+                                <TableRow key={syllabus._id} className="hover:bg-slate-50">
+                                  <TableCell>
+                                    <div className="flex items-center gap-2 sm:gap-3">
+                                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-cyan-100 rounded-lg flex items-center justify-center">
+                                        <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600" />
+                                      </div>
+                                      <div>
+                                        <p className="font-medium text-slate-900 text-sm sm:text-base">{syllabus.subject}</p>
+                                        <p className="text-xs sm:text-sm text-slate-500">{syllabus.className}</p>
+                                      </div>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <div className="flex flex-col sm:flex-row justify-end gap-1 sm:gap-2">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
+                                        onClick={() => setViewingSyllabus(syllabus)}
+                                      >
+                                        <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                                        <span className="hidden sm:inline">View Details</span>
+                                        <span className="sm:hidden">View</span>
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        className="bg-cyan-600 hover:bg-cyan-700 text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
+                                        onClick={() => handleDownload(syllabus.pdfUrl)}
+                                      >
+                                        <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                                        Download
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
                       </div>
-                    )}
-                  </TabsContent>
+                    ) : null}
+                  </div>
                 ))}
-              </Tabs>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  No Syllabus Available
+                </h3>
+                <p className="text-slate-600">
+                  Syllabuses will be available soon.
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>

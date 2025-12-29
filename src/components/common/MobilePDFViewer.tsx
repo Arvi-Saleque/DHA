@@ -44,7 +44,7 @@ export default function MobilePDFViewer({ pdfUrl, totalPages = 15 }: MobilePDFVi
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <div className="w-full h-screen flex flex-col bg-gray-100 dark:bg-slate-900">
+    <div className="w-full h-screen flex flex-col">
       <style jsx global>{`
         @media (max-width: 768px) {
           .swiper-button-next,
@@ -56,6 +56,14 @@ export default function MobilePDFViewer({ pdfUrl, totalPages = 15 }: MobilePDFVi
           .swiper-button-prev:after {
             font-size: 16px !important;
           }
+        }
+        .swiper-pagination {
+          bottom: 10px !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        .swiper-pagination-bullet {
+          margin: 0 4px !important;
         }
       `}</style>
       <div className="flex-1 overflow-hidden">
@@ -72,13 +80,12 @@ export default function MobilePDFViewer({ pdfUrl, totalPages = 15 }: MobilePDFVi
           className="h-full w-full"
         >
           {pages.map((page) => (
-            <SwiperSlide key={page} className="flex items-center justify-center p-0">
+            <SwiperSlide key={page} className="!p-0 !m-0">
               <div className="swiper-zoom-container w-full h-full">
                 <img 
                   src={`https://res.cloudinary.com/${cloudName}/image/upload/w_2400,q_auto:best,f_auto,dpr_2.0/pg_${page}/${publicId}.jpg`}
                   alt={`Page ${page}`}
-                  className="w-full h-full object-contain max-w-none"
-                  style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+                  className="w-full h-full object-cover"
                   loading={page <= 2 ? "eager" : "lazy"}
                 />
               </div>

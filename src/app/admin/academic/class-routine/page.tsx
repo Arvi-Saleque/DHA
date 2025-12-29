@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pencil, Trash2, Plus, Search } from 'lucide-react';
+import { Pencil, Trash2, Plus, Search, AlertTriangle } from 'lucide-react';
 import PdfUploader from '@/components/common/PdfUploader';
 
 interface ClassRoutine {
@@ -17,6 +17,7 @@ interface ClassRoutine {
   className: string;
   routineName: string;
   pdfUrl: string;
+  totalPages?: number;
   isActive: boolean;
 }
 
@@ -32,6 +33,7 @@ export default function ClassRoutineManagement() {
     className: '',
     routineName: '',
     pdfUrl: '',
+    totalPages: 15,
   });
 
   useEffect(() => {
@@ -64,6 +66,7 @@ export default function ClassRoutineManagement() {
       className: formData.className,
       routineName: formData.routineName,
       pdfUrl: formData.pdfUrl,
+      totalPages: formData.totalPages,
     };
 
     try {
@@ -95,6 +98,7 @@ export default function ClassRoutineManagement() {
       className: classRoutine.className,
       routineName: classRoutine.routineName,
       pdfUrl: classRoutine.pdfUrl,
+      totalPages: classRoutine.totalPages || 15,
     });
     setIsDialogOpen(true);
   };
@@ -110,11 +114,34 @@ export default function ClassRoutineManagement() {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (confirm('⚠️ WARNING: This will delete ALL class routine records. Are you sure?')) {
+      if (confirm('This action cannot be undone. Do you really want to delete all class routine records?')) {
+        try {
+          const response = await fetch('/api/class-routine', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ deleteAll: true }),
+          });
+          
+          if (response.ok) {
+            alert('All class routine records deleted successfully');
+            fetchClassRoutines();
+          }
+        } catch (error) {
+          console.error('Error deleting all class routines:', error);
+          alert('Failed to delete all records');
+        }
+      }
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       className: '',
       routineName: '',
       pdfUrl: '',
+      totalPages: 15,
     });
     setEditingClassRoutine(null);
   };
@@ -130,8 +157,17 @@ export default function ClassRoutineManagement() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Class Routine Management</h1>
-        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
+          <h1 className="text-3xl font-bold">Class Routine Management</h1>
+          <div className="flex gap-2">
+            <Button
+              variant="destructive"
+              onClick={handleDeleteAll}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <AlertTriangle className="mr-2 h-4 w-4" />
+              Delete All
+            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
@@ -183,6 +219,20 @@ export default function ClassRoutineManagement() {
                 />
               </div>
 
+              <div>
+                <Label htmlFor="totalPages">Total Pages (for PDF viewer)</Label>
+                <Input
+                  id="totalPages"
+                  type="number"
+                  min="1"
+                  value={formData.totalPages}
+                  onChange={(e) => setFormData({ ...formData, totalPages: parseInt(e.target.value) || 15 })}
+                  placeholder="Number of pages in PDF"
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">Enter the total number of pages in the PDF for proper navigation</p>
+              </div>
+
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => handleDialogClose(false)}>
                   Cancel
@@ -194,9 +244,10 @@ export default function ClassRoutineManagement() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
+          </div>
+        </div>
 
-      <Card>
+        <Card>
         <CardHeader>
           <CardTitle>Class Routine Overview</CardTitle>
           <div className="flex items-center space-x-2">

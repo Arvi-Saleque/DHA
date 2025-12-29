@@ -115,42 +115,40 @@ export default function ChairmanMessagePage() {
     }
   };
 
-  // Default fallback data
-  const defaultData: ChairmanMessageData = {
-    chairmanName: "Haji Abdul Malik",
-    chairmanTitle: "Chairman, Board of Trustees",
-    servingSince: "2010",
-    chairmanImageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=800&fit=crop",
-    signatureImageUrl: "https://images.unsplash.com/photo-1589624100685-de0c1c6d0bcf?w=200&h=100&fit=crop&q=80",
-    messageTitle: "Assalamu Alaikum & Greetings",
-    messageParagraphs: [
-      "It gives me immense pleasure to welcome you to our esteemed institution, a place where faith meets knowledge, and tradition blends seamlessly with modern educational excellence.",
-      "Since our establishment, we have been dedicated to nurturing young minds with a perfect balance of Islamic teachings and contemporary education. Our mission has always been to develop individuals who are not only academically accomplished but also possess strong moral character and spiritual values.",
-      "Education is the cornerstone of a prosperous society, and Islamic education is the foundation of a meaningful life. We strive to provide an environment where students can flourish intellectually, spiritually, and morally, preparing them to become responsible citizens and compassionate human beings.",
-      "I am proud of our dedicated faculty, supportive staff, and committed students who work together to maintain the high standards of excellence that define our institution. Our success is measured not just by academic achievements but by the positive impact our graduates make in their communities.",
-      "I invite you to join our growing family and be part of this journey towards excellence in Islamic education. Together, we can build a brighter future rooted in faith, knowledge, and service to humanity.",
-    ],
-    closingMessage: "May Allah guide us all on the path of knowledge and righteousness.",
-    closingRegards: "Warm regards,",
-    coreValues: [
-      { icon: "BookOpen", title: "Quality Education", description: "Commitment to academic excellence" },
-      { icon: "Heart", title: "Moral Values", description: "Building character and integrity" },
-      { icon: "Users", title: "Community Service", description: "Contributing to society" },
-      { icon: "Target", title: "Future Vision", description: "Preparing for tomorrow's challenges" },
-    ],
-    achievements: [
-      "Established world-class educational facilities",
-      "Trained over 10,000 students in the past decade",
-      "Received National Education Excellence Award",
-      "Pioneered innovative teaching methodologies",
-      "Built strong community partnerships",
-      "Achieved 95% student success rate consistently",
-    ],
-    inspirationalQuote: "Education is the most powerful weapon which you can use to change the world, and faith is the light that guides us on that journey.",
-    quoteAuthor: "Haji Abdul Malik, Chairman",
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-cyan-600 mx-auto mb-4"></div>
+          <p className="text-slate-600 text-lg">Loading Chairman's Message...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const data = chairmanData || defaultData;
+  if (!chairmanData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+        <div className="text-center px-4">
+          <MessageCircle className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            No Message Available
+          </h3>
+          <p className="text-slate-600 mb-6">
+            The chairman's message has not been set up yet.
+          </p>
+          <Link href="/about">
+            <Button className="bg-cyan-600 hover:bg-cyan-700">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to About
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const data = chairmanData;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -178,7 +176,7 @@ export default function ChairmanMessagePage() {
             Leadership Message
           </Badge>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 drop-shadow-lg">
-            {loading ? "Loading..." : "Chairman's Message"}
+            Chairman's Message
           </h1>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-cyan-50 max-w-3xl drop-shadow-md">
             A message from our esteemed Chairman
