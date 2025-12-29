@@ -5,28 +5,25 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   Calendar,
   Download,
   Eye,
-  Clock,
+  GraduationCap,
   ArrowLeft,
   FileText,
-  GraduationCap,
+  Clock,
 } from "lucide-react";
+import MobilePDFViewer from "@/components/common/MobilePDFViewer";
 
 interface ClassRoutine {
   _id: string;
   className: string;
   routineName: string;
   pdfUrl: string;
+  totalPages?: number;
   isActive: boolean;
 }
 
@@ -42,7 +39,8 @@ const convertGoogleDriveUrl = (url: string): string => {
 export default function RoutinePage() {
   const [classRoutines, setClassRoutines] = useState<ClassRoutine[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedClass, setSelectedClass] = useState<string>("all");
+  const [selectedClass, setSelectedClass] = useState("Play Group");
+  const [viewingRoutine, setViewingRoutine] = useState<ClassRoutine | null>(null);
 
   const classes = ['Play Group', 'Nursery', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7'];
 
@@ -69,31 +67,59 @@ export default function RoutinePage() {
     }
   };
 
-  const handleDownload = (pdfUrl: string) => {
-    const match = pdfUrl.match(/\/file\/d\/([^\/]+)/);
-    if (match && match[1]) {
-      window.open(`https://drive.google.com/uc?export=download&id=${match[1]}`, '_blank');
+  const handleDownload = async (pdfUrl: string) => {
+    try {
+      const match = pdfUrl.match(/\/file\/d\/([^\/]+)/);
+      if (match && match[1]) {
+        window.open(`https://drive.google.com/uc?export=download&id=${match[1]}`, '_blank');
+      } else {
+        const response = await fetch(pdfUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `class-routine-${Date.now()}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+      window.open(pdfUrl, '_blank');
     }
   };
 
-  const filteredRoutines = selectedClass === "all" 
-    ? classRoutines 
-    : classRoutines.filter(routine => routine.className === selectedClass);
+  const classGroups = classes
+    .map(cls => ({
+      id: cls.toLowerCase().replace(' ', '-'),
+      label: cls,
+      routines: classRoutines.filter((r) => r.className === cls),
+    }))
+    .filter(group => group.routines.length > 0);
+
+  // Set the first available class when data loads
+  useEffect(() => {
+    if (classGroups.length > 0 && !selectedClass) {
+      setSelectedClass(classGroups[0].label);
+    }
+  }, [classRoutines, classGroups.length]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
-      <section className="mb-20 relative h-[300px] bg-cyan-600 overflow-hidden">
+      <section className="mb-20 relative h-[300px] sm:h-[350px] md:h-[400px] bg-cyan-600 overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20"></div>
 
         <div className="relative container mx-auto px-4 h-full flex flex-col justify-center items-center text-white text-center">
           <Link href="/">
             <Button
               variant="ghost"
-              className="absolute top-6 left-6 text-white hover:bg-white/20"
+              className="absolute top-4 left-4 sm:top-6 sm:left-6 md:top-8 md:left-8 text-white hover:bg-white/20"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
+              <span className="hidden sm:inline">Back to Home</span>
+              <span className="sm:hidden">Back</span>
             </Button>
           </Link>
 
@@ -104,11 +130,11 @@ export default function RoutinePage() {
             <Clock className="w-3 h-3 mr-1" />
             Academic Portal
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 drop-shadow-lg">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 drop-shadow-lg">
             Class Routine
           </h1>
-          <p className="text-lg md:text-xl text-cyan-50 max-w-2xl drop-shadow-md">
-            View daily class schedules and timetables for all classes
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-cyan-50 max-w-3xl drop-shadow-md">
+            Daily schedules and timetables for all classes
           </p>
         </div>
       </section>
@@ -118,241 +144,161 @@ export default function RoutinePage() {
         <Card className="border-none shadow-xl">
           <CardHeader className="border-b bg-slate-50/50">
             <CardTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-              <Calendar className="w-6 h-6 text-cyan-600" />
-              Class Timetables
+              <FileText className="w-6 h-6 text-cyan-600" />
+              Class Routines by Class Level
             </CardTitle>
             <p className="text-sm text-slate-600 mt-2">
-              Filter by class to view specific timetables
+              Select a class to view and download class routines
             </p>
           </CardHeader>
 
           <CardContent className="p-6">
-            {/* Filter Section */}
-            <div className="mb-8 p-4 bg-slate-50 rounded-lg border max-w-md">
-              <label className="text-sm font-semibold text-slate-700 flex items-center gap-2 mb-2">
-                <GraduationCap className="w-4 h-4 text-cyan-600" />
-                Filter by Class
-              </label>
-              <Select value={selectedClass} onValueChange={setSelectedClass}>
-                <SelectTrigger className="w-full bg-white">
-                  <SelectValue placeholder="Select class" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Classes</SelectItem>
-                  {classes.map((cls) => (
-                    <SelectItem key={cls} value={cls}>{cls}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Results Section */}
             {loading ? (
               <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto"></div>
                 <p className="text-slate-600 mt-4">Loading class routines...</p>
               </div>
-            ) : (
+            ) : classGroups.length > 0 ? (
               <div className="space-y-6">
-                {filteredRoutines.length > 0 ? (
-                  <div>
-                    <div className="mb-4 flex items-center justify-between">
-                      <p className="text-sm text-slate-600">
-                        Showing <strong>{filteredRoutines.length}</strong>{" "}
-                        class routine{filteredRoutines.length !== 1 ? "s" : ""}
-                      </p>
-                      {selectedClass !== "all" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedClass("all")}
-                        >
-                          Clear Filter
-                        </Button>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {filteredRoutines.map((routine) => (
-                        <Card
-                          key={routine._id}
-                          className="border-2 hover:border-cyan-300 transition-all overflow-hidden group"
-                        >
-                          <CardHeader className="bg-gradient-to-r from-slate-50 to-purple-50 border-b pb-4">
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1">
-                                <CardTitle className="text-lg text-slate-900 leading-tight mb-2">
-                                  {routine.routineName}
-                                </CardTitle>
-                                <Badge variant="outline" className="gap-1">
-                                  <GraduationCap className="w-3 h-3" />
-                                  {routine.className}
-                                </Badge>
-                              </div>
-                            </div>
-                          </CardHeader>
-
-                          <CardContent className="p-0">
-                            {/* PDF Preview */}
-                            <div className="relative h-72 overflow-hidden bg-slate-100">
-                              <iframe
-                                src={convertGoogleDriveUrl(routine.pdfUrl)}
-                                className="w-full h-full border-0 pointer-events-none"
-                                allow="autoplay"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                                <div className="absolute bottom-4 left-4 right-4 flex gap-3">
-                                  <Button
-                                    size="sm"
-                                    className="flex-1 bg-white text-slate-900 hover:bg-slate-100"
-                                    onClick={() => handleViewDetails(routine.pdfUrl)}
-                                  >
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    View Routine
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    className="flex-1 bg-cyan-600 hover:bg-cyan-700"
-                                    onClick={() => handleDownload(routine.pdfUrl)}
-                                  >
-                                    <Download className="w-4 h-4 mr-2" />
-                                    Download PDF
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Mobile Action Buttons */}
-                            <div className="p-4 bg-slate-50 flex gap-3 lg:hidden">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex-1"
-                                onClick={() => handleViewDetails(routine.pdfUrl)}
-                              >
-                                <Eye className="w-4 h-4 mr-2" />
-                                View
-                              </Button>
-                              <Button
-                                size="sm"
-                                className="flex-1 bg-cyan-600 hover:bg-cyan-700"
-                                onClick={() => handleDownload(routine.pdfUrl)}
-                              >
-                                <Download className="w-4 h-4 mr-2" />
-                                Download
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
+                {/* Class Selector Dropdown */}
+                <div className="mb-8 p-4 bg-slate-50 rounded-lg border max-w-md">
+                  <label className="text-sm font-semibold text-slate-700 flex items-center gap-2 mb-2">
+                    <GraduationCap className="w-4 h-4 text-cyan-600" />
+                    Filter by Class
+                  </label>
+                  <Select
+                    value={selectedClass}
+                    onValueChange={setSelectedClass}
+                  >
+                    <SelectTrigger className="w-full bg-white">
+                      <SelectValue placeholder="Select class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {classGroups.map((group) => (
+                        <SelectItem key={group.id} value={group.label}>
+                          {group.label}
+                        </SelectItem>
                       ))}
-                    </div>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Display routines for selected class */}
+                {classGroups
+                  .filter(group => group.label === selectedClass)
+                  .map((group) => (
+                  <div key={group.id}>
+                    {viewingRoutine ? (
+                      /* PDF Viewer Mode */
+                      <div className="-mx-6 -mb-6">
+                        <div className="relative">
+                          {/* Back Button */}
+                          <div className="py-2 sm:py-3 bg-slate-100 px-3 sm:px-6 flex items-center justify-between">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
+                              onClick={() => setViewingRoutine(null)}
+                            >
+                              <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                              <span className="hidden sm:inline">Back to List</span>
+                              <span className="sm:hidden">Back</span>
+                            </Button>
+                            <Badge variant="outline" className="gap-1 text-xs sm:text-sm">
+                              <GraduationCap className="w-3 h-3" />
+                              <span className="hidden sm:inline">{viewingRoutine.routineName}</span>
+                            </Badge>
+                          </div>
+
+                          {/* Mobile-Optimized PDF Viewer */}
+                          <MobilePDFViewer
+                            pdfUrl={viewingRoutine.pdfUrl}
+                            totalPages={viewingRoutine.totalPages || 15}
+                          />
+
+                          {/* Action Buttons */}
+                          <div className="py-2 sm:py-3 bg-slate-50 flex justify-center">
+                            <Button
+                              className="bg-cyan-600 hover:bg-cyan-700 text-xs sm:text-sm px-3 sm:px-4 h-8 sm:h-10"
+                              onClick={() => handleDownload(viewingRoutine.pdfUrl)}
+                            >
+                              <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                              Download PDF
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : group.routines.length > 0 ? (
+                      /* Table View Mode */
+                      <div>
+                        <div className="mb-4">
+                          <p className="text-sm text-slate-600">
+                            Showing <strong>{group.routines.length}</strong> routine{group.routines.length !== 1 ? 's' : ''} for {group.label}
+                          </p>
+                        </div>
+                        <div className="rounded-lg border border-slate-200 overflow-hidden">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="bg-slate-50">
+                                <TableHead className="font-semibold">Routine Name</TableHead>
+                                <TableHead className="text-right font-semibold">Actions</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {group.routines.map((routine) => (
+                                <TableRow key={routine._id} className="hover:bg-slate-50">
+                                  <TableCell>
+                                    <div className="flex items-center gap-2 sm:gap-3">
+                                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-cyan-100 rounded-lg flex items-center justify-center">
+                                        <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600" />
+                                      </div>
+                                      <div>
+                                        <p className="font-medium text-slate-900 text-sm sm:text-base">{routine.routineName}</p>
+                                        <p className="text-xs sm:text-sm text-slate-500">{routine.className}</p>
+                                      </div>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <div className="flex flex-col sm:flex-row justify-end gap-1 sm:gap-2">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
+                                        onClick={() => setViewingRoutine(routine)}
+                                      >
+                                        <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                                        <span className="hidden sm:inline">View Details</span>
+                                        <span className="sm:hidden">View</span>
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        className="bg-cyan-600 hover:bg-cyan-700 text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
+                                        onClick={() => handleDownload(routine.pdfUrl)}
+                                      >
+                                        <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                                        Download
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                      No Routines Found
-                    </h3>
-                    <p className="text-slate-600">
-                      No class routines match your current filter.
-                    </p>
-                    {selectedClass !== "all" && (
-                      <Button
-                        variant="outline"
-                        className="mt-4"
-                        onClick={() => setSelectedClass("all")}
-                      >
-                        Clear Filter
-                      </Button>
-                    )}
-                  </div>
-                )}
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">No Class Routines Available</h3>
+                <p className="text-slate-600">
+                  Class routines will be posted here when available.
+                </p>
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Info Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <Card className="border-l-4 border-l-cyan-500">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-3">
-                <Clock className="w-8 h-8 text-cyan-600 flex-shrink-0" />
-                <div>
-                  <h3 className="font-bold text-slate-900 mb-1">Daily Schedule</h3>
-                  <p className="text-sm text-slate-600">
-                    View complete daily timetables with all subjects and break times.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-blue-500">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-3">
-                <Download className="w-8 h-8 text-blue-600 flex-shrink-0" />
-                <div>
-                  <h3 className="font-bold text-slate-900 mb-1">
-                    Download & Print
-                  </h3>
-                  <p className="text-sm text-slate-600">
-                    Download routines as PDF files for offline access and printing.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-cyan-500">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-3">
-                <Calendar className="w-8 h-8 text-cyan-600 flex-shrink-0" />
-                <div>
-                  <h3 className="font-bold text-slate-900 mb-1">
-                    Stay Updated
-                  </h3>
-                  <p className="text-sm text-slate-600">
-                    Check regularly for any updates or changes to class schedules.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Important Notice */}
-        <Card className="mt-8 border-2 border-amber-200 bg-amber-50/50">
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <FileText className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-900 mb-3">
-                  Important Information
-                </h3>
-                <div className="space-y-2 text-slate-700">
-                  <p className="flex items-start gap-2">
-                    <span className="font-bold text-amber-600 mt-0.5">•</span>
-                    <span>
-                      Students must follow the routine and arrive on time for all classes
-                    </span>
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <span className="font-bold text-amber-600 mt-0.5">•</span>
-                    <span>
-                      Special activities and events may cause temporary schedule changes
-                    </span>
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <span className="font-bold text-amber-600 mt-0.5">•</span>
-                    <span>
-                      Contact your class teacher for any questions about the routine
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </section>

@@ -174,7 +174,7 @@ export default function AdmissionPage() {
                             <h3 className="text-lg font-bold text-slate-900 mb-2">
                               {req.title}
                             </h3>
-                            <p className="text-slate-600 leading-relaxed">
+                            <p className="text-slate-600 leading-relaxed whitespace-pre-line">
                               {req.description}
                             </p>
                           </div>
@@ -222,7 +222,7 @@ export default function AdmissionPage() {
                             <h3 className="text-lg font-bold text-slate-900 mb-2">
                               {doc.title}
                             </h3>
-                            <p className="text-slate-600 leading-relaxed">
+                            <p className="text-slate-600 leading-relaxed whitespace-pre-line">
                               {doc.description}
                             </p>
                           </div>

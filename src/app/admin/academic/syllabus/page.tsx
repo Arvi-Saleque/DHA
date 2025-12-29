@@ -17,6 +17,7 @@ interface Syllabus {
   className: string;
   subject: string;
   pdfUrl: string;
+  totalPages?: number;
   isActive: boolean;
 }
 
@@ -32,6 +33,7 @@ export default function SyllabusManagement() {
     className: '',
     subject: '',
     pdfUrl: '',
+    totalPages: 15,
   });
 
   useEffect(() => {
@@ -64,6 +66,7 @@ export default function SyllabusManagement() {
       className: formData.className,
       subject: formData.subject,
       pdfUrl: formData.pdfUrl,
+      totalPages: formData.totalPages,
     };
 
     try {
@@ -95,6 +98,7 @@ export default function SyllabusManagement() {
       className: syllabus.className,
       subject: syllabus.subject,
       pdfUrl: syllabus.pdfUrl,
+      totalPages: syllabus.totalPages || 15,
     });
     setIsDialogOpen(true);
   };
@@ -137,6 +141,7 @@ export default function SyllabusManagement() {
       className: '',
       subject: '',
       pdfUrl: '',
+      totalPages: 15,
     });
     setEditingSyllabus(null);
   };
@@ -212,6 +217,22 @@ export default function SyllabusManagement() {
                   onChange={(url) => setFormData({ ...formData, pdfUrl: url })}
                   folder="syllabus"
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="totalPages">Total Pages</Label>
+                <Input
+                  id="totalPages"
+                  type="number"
+                  min="1"
+                  value={formData.totalPages}
+                  onChange={(e) => setFormData({ ...formData, totalPages: parseInt(e.target.value) || 15 })}
+                  placeholder="Enter total number of pages"
+                  required
+                />
+                <p className="text-sm text-slate-500 mt-1">
+                  Number of pages in the PDF for proper viewer display
+                </p>
               </div>
 
               <div className="flex justify-end gap-2">

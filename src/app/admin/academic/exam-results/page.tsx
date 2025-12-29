@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
@@ -36,19 +37,18 @@ import {
   Trash2,
   Search,
 } from "lucide-react";
+import PdfUploader from "@/components/common/PdfUploader";
 
 interface ExamResult {
   _id: string;
   className: string;
   examName: string;
-  examType: string;
-  publishedDate: string;
   pdfUrl: string;
+  totalPages?: number;
   passPercentage: number;
 }
 
 const classes = ['Play Group', 'Nursery', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7'];
-const examTypes = ['Midterm', 'Final', 'Terminal'];
 
 export default function ExamResultsAdminPage() {
   const [results, setResults] = useState<ExamResult[]>([]);
@@ -59,9 +59,8 @@ export default function ExamResultsAdminPage() {
   const [formData, setFormData] = useState({
     className: '',
     examName: '',
-    examType: '',
-    publishedDate: '',
     pdfUrl: '',
+    totalPages: 15,
     passPercentage: '',
   });
 
@@ -72,8 +71,7 @@ export default function ExamResultsAdminPage() {
   useEffect(() => {
     const filtered = results.filter((result) =>
       result.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      result.examName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      result.examType.toLowerCase().includes(searchTerm.toLowerCase())
+      result.examName.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredResults(filtered);
   }, [searchTerm, results]);
@@ -95,11 +93,12 @@ export default function ExamResultsAdminPage() {
     const resultData = {
       className: formData.className,
       examName: formData.examName,
-      examType: formData.examType,
-      publishedDate: formData.publishedDate,
       pdfUrl: formData.pdfUrl,
+      totalPages: formData.totalPages,
       passPercentage: Number(formData.passPercentage),
     };
+
+    console.log('Submitting exam result data:', resultData);
 
     try {
       if (editingResult) {
@@ -129,9 +128,8 @@ export default function ExamResultsAdminPage() {
     setFormData({
       className: result.className,
       examName: result.examName,
-      examType: result.examType,
-      publishedDate: result.publishedDate.split('T')[0],
       pdfUrl: result.pdfUrl,
+      totalPages: result.totalPages || 15,
       passPercentage: result.passPercentage.toString(),
     });
     setIsDialogOpen(true);
@@ -165,9 +163,8 @@ export default function ExamResultsAdminPage() {
     setFormData({
       className: '',
       examName: '',
-      examType: '',
-      publishedDate: '',
       pdfUrl: '',
+      totalPages: 15,
       passPercentage: '',
     });
     setEditingResult(null);
@@ -178,15 +175,6 @@ export default function ExamResultsAdminPage() {
     if (!open) {
       resetForm();
     }
-  };
-
-  const getExamTypeBadge = (type: string) => {
-    const badges: Record<string, string> = {
-      Midterm: 'bg-cyan-100 text-cyan-700',
-      Final: 'bg-purple-100 text-purple-700',
-      Terminal: 'bg-amber-100 text-amber-700',
-    };
-    return badges[type] || 'bg-gray-100 text-gray-700';
   };
 
   return (
@@ -214,6 +202,9 @@ export default function ExamResultsAdminPage() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingResult ? 'Edit Exam Result' : 'Add New Exam Result'}</DialogTitle>
+              <DialogDescription>
+                Upload exam results with pass percentage information
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -251,53 +242,26 @@ export default function ExamResultsAdminPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="examType">Exam Type</Label>
-                  <Select
-                    value={formData.examType}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, examType: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select exam type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {examTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="publishedDate">Published Date</Label>
-                  <Input
-                    id="publishedDate"
-                    type="date"
-                    value={formData.publishedDate}
-                    onChange={(e) =>
-                      setFormData({ ...formData, publishedDate: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="pdfUrl">PDF URL (Google Drive)</Label>
-                  <Input
-                    id="pdfUrl"
-                    placeholder="https://drive.google.com/file/d/..."
+                  <PdfUploader
+                    label="Exam Result PDF"
                     value={formData.pdfUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, pdfUrl: e.target.value })
-                    }
+                    onChange={(url) => setFormData({ ...formData, pdfUrl: url })}
+                    folder="exam-results"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="totalPages">Total Pages (for PDF viewer)</Label>
+                  <Input
+                    id="totalPages"
+                    type="number"
+                    min="1"
+                    value={formData.totalPages}
+                    onChange={(e) => setFormData({ ...formData, totalPages: parseInt(e.target.value) || 15 })}
+                    placeholder="Number of pages in PDF"
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Paste Google Drive share link
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Enter the total number of pages in the PDF for proper navigation</p>
                 </div>
 
                 <div>
@@ -345,7 +309,7 @@ export default function ExamResultsAdminPage() {
           <div className="flex items-center space-x-2">
             <Search className="h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search by class, exam name, or type..."
+              placeholder="Search by class or exam name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="max-w-sm"
@@ -358,8 +322,6 @@ export default function ExamResultsAdminPage() {
               <TableRow>
                 <TableHead>Class</TableHead>
                 <TableHead>Exam Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Published Date</TableHead>
                 <TableHead>Pass %</TableHead>
                 <TableHead>PDF URL</TableHead>
                 <TableHead>Actions</TableHead>
@@ -370,14 +332,6 @@ export default function ExamResultsAdminPage() {
                 <TableRow key={result._id}>
                   <TableCell className="font-medium">{result.className}</TableCell>
                   <TableCell>{result.examName}</TableCell>
-                  <TableCell>
-                    <Badge className={getExamTypeBadge(result.examType)}>
-                      {result.examType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {new Date(result.publishedDate).toLocaleDateString()}
-                  </TableCell>
                   <TableCell className="font-semibold text-green-600">
                     {result.passPercentage}%
                   </TableCell>

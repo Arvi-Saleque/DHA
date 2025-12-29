@@ -4,6 +4,20 @@ const AdmissionFeeSchema = new mongoose.Schema({
   className: {
     type: String,
     required: true,
+    enum: [
+      'Play Group',
+      'Nursery',
+      'Class 1',
+      'Class 2',
+      'Class 3',
+      'Class 4',
+      'Class 5',
+      'Class 6',
+      'Class 7',
+      'Class 8',
+      'Class 9',
+      'Class 10',
+    ],
   },
   admissionFee: {
     type: Number,
@@ -13,13 +27,13 @@ const AdmissionFeeSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  examFee: {
+  dinningFee: {
     type: Number,
     required: true,
   },
-  otherFees: {
+  examFee: {
     type: Number,
-    default: 0,
+    required: true,
   },
   isActive: {
     type: Boolean,

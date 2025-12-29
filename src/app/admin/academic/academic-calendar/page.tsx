@@ -31,6 +31,7 @@ import {
   Trash2,
   FileText,
   AlertCircle,
+  AlertTriangle,
 } from "lucide-react";
 
 interface AcademicCalendar {
@@ -38,6 +39,7 @@ interface AcademicCalendar {
   month: string;
   pdfUrl: string;
   isActive: boolean;
+  totalPages?: number;
   createdAt: string;
 }
 
@@ -52,6 +54,7 @@ export default function AcademicCalendarManagement() {
   const [formData, setFormData] = useState({
     month: "",
     pdfUrl: "",
+    totalPages: 15,
   });
 
   useEffect(() => {
@@ -87,6 +90,8 @@ export default function AcademicCalendarManagement() {
         ? { ...formData, _id: editingCalendar._id }
         : formData;
 
+      console.log("Submitting calendar data:", body);
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -94,9 +99,15 @@ export default function AcademicCalendarManagement() {
       });
 
       if (response.ok) {
+        const result = await response.json();
+        console.log("Server response:", result);
         await fetchCalendars();
         setIsDialogOpen(false);
         resetForm();
+      } else {
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        alert(`Failed to save calendar: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error saving calendar:", error);
@@ -110,6 +121,7 @@ export default function AcademicCalendarManagement() {
     setFormData({
       month: calendar.month,
       pdfUrl: calendar.pdfUrl,
+      totalPages: calendar.totalPages || 15,
     });
     setIsDialogOpen(true);
   };
@@ -130,10 +142,32 @@ export default function AcademicCalendarManagement() {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (!confirm("⚠️ WARNING: This will delete ALL calendars. Are you absolutely sure?")) return;
+    if (!confirm("This action cannot be undone. Delete all calendars?")) return;
+
+    try {
+      const response = await fetch("/api/academic-calendar", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deleteAll: true }),
+      });
+
+      if (response.ok) {
+        await fetchCalendars();
+        alert("All calendars deleted successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting all calendars:", error);
+      alert("Failed to delete calendars");
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       month: "",
       pdfUrl: "",
+      totalPages: 15,
     });
     setEditingCalendar(null);
   };
@@ -157,7 +191,16 @@ export default function AcademicCalendarManagement() {
               Manage the academic calendar PDF (only one active calendar shown to students)
             </p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <div className="flex gap-2">
+            <Button
+              variant="destructive"
+              onClick={handleDeleteAll}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <AlertTriangle className="w-4 h-4 mr-2" />
+              Delete All
+            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button
                 className="bg-cyan-600 hover:bg-cyan-700"
@@ -201,6 +244,25 @@ export default function AcademicCalendarManagement() {
                   />
                 </div>
 
+                <div>
+                  <Label htmlFor="totalPages">Total Pages *</Label>
+                  <Input
+                    id="totalPages"
+                    type="number"
+                    min="1"
+                    placeholder="e.g., 15"
+                    value={formData.totalPages}
+                    onChange={(e) => {
+                      const numValue = parseInt(e.target.value, 10);
+                      setFormData({ ...formData, totalPages: isNaN(numValue) ? 1 : numValue });
+                    }}
+                    required
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    Enter the total number of pages in the PDF
+                  </p>
+                </div>
+
                 <div className="flex gap-3 pt-4">
                   <Button
                     type="submit"
@@ -221,6 +283,7 @@ export default function AcademicCalendarManagement() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {/* Search and Table */}

@@ -20,7 +20,10 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
     const body = await request.json();
-    const { month, pdfUrl } = body;
+    const { month, pdfUrl, totalPages } = body;
+
+    console.log("POST request body:", body);
+    console.log("totalPages value:", totalPages);
 
     if (!month || !pdfUrl) {
       return NextResponse.json(
@@ -29,11 +32,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const calendar = await AcademicCalendar.create({
+    const calendarData = {
       month,
       pdfUrl,
+      totalPages: totalPages || 15,
       isActive: true,
-    }) as any;
+    };
+
+    console.log("Creating calendar with data:", calendarData);
+
+    const calendar = await AcademicCalendar.create(calendarData) as any;
+    
+    console.log("Created calendar:", calendar);
     
     // Send automatic notification to subscribers
     await sendAutomaticNotification({
@@ -55,7 +65,7 @@ export async function PUT(request: NextRequest) {
   try {
     await connectDB();
     const body = await request.json();
-    const { _id, month, pdfUrl } = body;
+    const { _id, month, pdfUrl, totalPages } = body;
 
     if (!_id) {
       return NextResponse.json({ error: 'Calendar ID is required' }, { status: 400 });
@@ -63,7 +73,7 @@ export async function PUT(request: NextRequest) {
 
     const calendar = await AcademicCalendar.findByIdAndUpdate(
       _id,
-      { month, pdfUrl },
+      { month, pdfUrl, totalPages: totalPages || 15 },
       { new: true }
     );
 
@@ -82,6 +92,14 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     await connectDB();
+    
+    // Check if this is a delete all request
+    const body = await request.json().catch(() => null);
+    if (body?.deleteAll) {
+      await AcademicCalendar.deleteMany({});
+      return NextResponse.json({ message: 'All calendars deleted successfully' });
+    }
+    
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

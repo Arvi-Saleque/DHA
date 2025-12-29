@@ -41,10 +41,13 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { _id, ...updateData } = body;
     
+    // Add updatedAt timestamp
+    updateData.updatedAt = new Date();
+    
     const syllabus = await Syllabus.findByIdAndUpdate(
       _id,
       updateData,
-      { new: true }
+      { new: true, runValidators: true }
     );
     
     if (!syllabus) {

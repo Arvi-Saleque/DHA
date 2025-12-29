@@ -5,22 +5,19 @@ const todaysAbsenceSchema = new mongoose.Schema(
     className: {
       type: String,
       required: true,
+      enum: ['Play Group', 'Nursery', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7']
     },
-    section: {
+    absenceName: {
       type: String,
       required: true,
     },
-    title: {
+    pdfUrl: {
       type: String,
       required: true,
     },
-    imageUrl: {
-      type: String,
-      required: true,
-    },
-    date: {
-      type: Date,
-      default: Date.now,
+    totalPages: {
+      type: Number,
+      default: 15,
     },
     isActive: {
       type: Boolean,

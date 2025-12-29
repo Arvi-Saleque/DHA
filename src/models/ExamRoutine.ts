@@ -13,6 +13,10 @@ const ExamRoutineSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  totalPages: {
+    type: Number,
+    default: 15,
+  },
   isActive: {
     type: Boolean,
     default: true,

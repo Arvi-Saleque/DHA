@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -27,16 +28,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Search, Image as ImageIcon, AlertTriangle } from "lucide-react";
-import ImageUploader from "@/components/common/ImageUploader";
+import { Plus, Pencil, Trash2, Search, FileText, AlertTriangle } from "lucide-react";
+import PdfUploader from "@/components/common/PdfUploader";
 
 interface Absence {
   _id: string;
   className: string;
-  section: string;
-  title: string;
-  imageUrl: string;
-  date: string;
+  absenceName: string;
+  pdfUrl: string;
+  totalPages: number;
+  isActive: boolean;
   createdAt: string;
 }
 
@@ -50,6 +51,9 @@ const classOptions = [
   "Class 5",
   "Class 6",
   "Class 7",
+  "Class 8",
+  "Class 9",
+  "Class 10",
 ];
 
 export default function TodaysAbsencesAdmin() {
@@ -62,9 +66,9 @@ export default function TodaysAbsencesAdmin() {
 
   const [formData, setFormData] = useState({
     className: "",
-    section: "",
-    title: "",
-    imageUrl: "",
+    absenceName: "",
+    pdfUrl: "",
+    totalPages: 15,
   });
 
   useEffect(() => {
@@ -75,8 +79,7 @@ export default function TodaysAbsencesAdmin() {
     const filtered = absences.filter(
       (absence) =>
         absence.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        absence.section.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        absence.title.toLowerCase().includes(searchTerm.toLowerCase())
+        absence.absenceName.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredAbsences(filtered);
   }, [searchTerm, absences]);
@@ -135,9 +138,9 @@ export default function TodaysAbsencesAdmin() {
     setEditingAbsence(absence);
     setFormData({
       className: absence.className,
-      section: absence.section,
-      title: absence.title,
-      imageUrl: absence.imageUrl,
+      absenceName: absence.absenceName,
+      pdfUrl: absence.pdfUrl,
+      totalPages: absence.totalPages,
     });
     setIsDialogOpen(true);
   };
@@ -208,9 +211,9 @@ export default function TodaysAbsencesAdmin() {
   const resetForm = () => {
     setFormData({
       className: "",
-      section: "",
-      title: "",
-      imageUrl: "",
+      absenceName: "",
+      pdfUrl: "",
+      totalPages: 15,
     });
     setEditingAbsence(null);
   };
@@ -259,72 +262,75 @@ export default function TodaysAbsencesAdmin() {
               <DialogTitle>
                 {editingAbsence ? "Edit Absence Record" : "Add New Absence Record"}
               </DialogTitle>
+              <DialogDescription>
+                Upload absence sheet PDF for the selected class
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="className">
-                    Class <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    value={formData.className}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, className: value })
-                    }
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select class" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {classOptions.map((className) => (
-                        <SelectItem key={className} value={className}>
-                          {className}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="section">
-                    Section <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="section"
-                    value={formData.section}
-                    onChange={(e) =>
-                      setFormData({ ...formData, section: e.target.value })
-                    }
-                    placeholder="e.g., Section A"
-                    required
-                  />
-                </div>
+              <div>
+                <Label htmlFor="className">
+                  Class <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={formData.className}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, className: value })
+                  }
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select class" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {classOptions.map((className) => (
+                      <SelectItem key={className} value={className}>
+                        {className}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
-                <Label htmlFor="title">
-                  Title <span className="text-red-500">*</span>
+                <Label htmlFor="absenceName">
+                  Absence Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="title"
-                  value={formData.title}
+                  id="absenceName"
+                  value={formData.absenceName}
                   onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
+                    setFormData({ ...formData, absenceName: e.target.value })
                   }
-                  placeholder="e.g., Class 5 - Section A"
+                  placeholder="e.g., November 2024 Absences"
                   required
                 />
               </div>
 
               <div>
-                <ImageUploader
-                  label="Absence Sheet Image"
-                  value={formData.imageUrl}
+                <PdfUploader
+                  label="Absence Sheet PDF"
+                  value={formData.pdfUrl}
                   onChange={(url) =>
-                    setFormData({ ...formData, imageUrl: url })
+                    setFormData({ ...formData, pdfUrl: url })
                   }
                   folder="absences"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="totalPages">
+                  Total Pages <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="totalPages"
+                  type="number"
+                  min="1"
+                  value={formData.totalPages}
+                  onChange={(e) =>
+                    setFormData({ ...formData, totalPages: parseInt(e.target.value) || 1 })
+                  }
+                  placeholder="e.g., 15"
+                  required
                 />
               </div>
 
@@ -360,7 +366,7 @@ export default function TodaysAbsencesAdmin() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               type="text"
-              placeholder="Search by class, section, or title..."
+              placeholder="Search by class or absence name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -372,10 +378,10 @@ export default function TodaysAbsencesAdmin() {
           <TableHeader>
             <TableRow>
               <TableHead>Class</TableHead>
-              <TableHead>Section</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Image</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>Absence Name</TableHead>
+              <TableHead>PDF</TableHead>
+              <TableHead>Total Pages</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -390,25 +396,27 @@ export default function TodaysAbsencesAdmin() {
               filteredAbsences.map((absence) => (
                 <TableRow key={absence._id}>
                   <TableCell className="font-medium">{absence.className}</TableCell>
-                  <TableCell>{absence.section}</TableCell>
-                  <TableCell>{absence.title}</TableCell>
+                  <TableCell>{absence.absenceName}</TableCell>
                   <TableCell>
                     <a
-                      href={absence.imageUrl}
+                      href={absence.pdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
                     >
-                      <ImageIcon className="w-4 h-4" />
-                      View Image
+                      <FileText className="w-4 h-4" />
+                      View PDF
                     </a>
                   </TableCell>
+                  <TableCell>{absence.totalPages} pages</TableCell>
                   <TableCell>
-                    {new Date(absence.date).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      absence.isActive 
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {absence.isActive ? 'Active' : 'Inactive'}
+                    </span>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">

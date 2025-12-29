@@ -43,8 +43,8 @@ interface AdmissionFee {
   className: string;
   admissionFee: number;
   tuitionFee: number;
+  dinningFee: number;
   examFee: number;
-  otherFees: number;
   isActive: boolean;
   createdAt: string;
 }
@@ -63,8 +63,8 @@ export default function AdmissionFeeManagement() {
     className: "",
     admissionFee: "",
     tuitionFee: "",
+    dinningFee: "",
     examFee: "",
-    otherFees: "",
   });
 
   useEffect(() => {
@@ -102,15 +102,15 @@ export default function AdmissionFeeManagement() {
             _id: editingFee._id,
             admissionFee: Number(formData.admissionFee),
             tuitionFee: Number(formData.tuitionFee),
+            dinningFee: Number(formData.dinningFee),
             examFee: Number(formData.examFee),
-            otherFees: Number(formData.otherFees) || 0,
           }
         : { 
             ...formData,
             admissionFee: Number(formData.admissionFee),
             tuitionFee: Number(formData.tuitionFee),
+            dinningFee: Number(formData.dinningFee),
             examFee: Number(formData.examFee),
-            otherFees: Number(formData.otherFees) || 0,
           };
 
       const response = await fetch(url, {
@@ -137,8 +137,8 @@ export default function AdmissionFeeManagement() {
       className: fee.className,
       admissionFee: fee.admissionFee.toString(),
       tuitionFee: fee.tuitionFee.toString(),
+      dinningFee: fee.dinningFee.toString(),
       examFee: fee.examFee.toString(),
-      otherFees: fee.otherFees.toString(),
     });
     setIsDialogOpen(true);
   };
@@ -164,8 +164,8 @@ export default function AdmissionFeeManagement() {
       className: "",
       admissionFee: "",
       tuitionFee: "",
+      dinningFee: "",
       examFee: "",
-      otherFees: "",
     });
     setEditingFee(null);
   };
@@ -231,7 +231,7 @@ export default function AdmissionFeeManagement() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="admissionFee">Admission Fee (₨) *</Label>
+                    <Label htmlFor="admissionFee">Admission Fee (Yearly) (৳) *</Label>
                     <Input
                       id="admissionFee"
                       type="number"
@@ -245,7 +245,7 @@ export default function AdmissionFeeManagement() {
                   </div>
 
                   <div>
-                    <Label htmlFor="tuitionFee">Monthly Tuition Fee (₨) *</Label>
+                    <Label htmlFor="tuitionFee">Tuition Fee (Monthly) (৳) *</Label>
                     <Input
                       id="tuitionFee"
                       type="number"
@@ -261,7 +261,21 @@ export default function AdmissionFeeManagement() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="examFee">Exam Fee (₨) *</Label>
+                    <Label htmlFor="dinningFee">Dinning Fee (Monthly) (৳) *</Label>
+                    <Input
+                      id="dinningFee"
+                      type="number"
+                      placeholder="e.g., 2000"
+                      value={formData.dinningFee}
+                      onChange={(e) =>
+                        setFormData({ ...formData, dinningFee: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="examFee">Exam Fee (Semester) (৳) *</Label>
                     <Input
                       id="examFee"
                       type="number"
@@ -271,19 +285,6 @@ export default function AdmissionFeeManagement() {
                         setFormData({ ...formData, examFee: e.target.value })
                       }
                       required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="otherFees">Other Fees (₨)</Label>
-                    <Input
-                      id="otherFees"
-                      type="number"
-                      placeholder="e.g., 500 (optional)"
-                      value={formData.otherFees}
-                      onChange={(e) =>
-                        setFormData({ ...formData, otherFees: e.target.value })
-                      }
                     />
                   </div>
                 </div>
@@ -353,36 +354,31 @@ export default function AdmissionFeeManagement() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Class</TableHead>
-                      <TableHead>Admission Fee</TableHead>
-                      <TableHead>Monthly Tuition</TableHead>
-                      <TableHead>Exam Fee</TableHead>
-                      <TableHead>Other Fees</TableHead>
-                      <TableHead>Total (Annual)</TableHead>
+                      <TableHead>Admission Fee (Yearly)</TableHead>
+                      <TableHead>Tuition Fee (Monthly)</TableHead>
+                      <TableHead>Dinning Fee (Monthly)</TableHead>
+                      <TableHead>Exam Fee (Semester)</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredFees.map((fee) => {
-                      const annualTotal = fee.admissionFee + (fee.tuitionFee * 12) + fee.examFee + fee.otherFees;
                       return (
                         <TableRow key={fee._id}>
                           <TableCell className="font-medium">
                             {fee.className}
                           </TableCell>
                           <TableCell className="font-semibold text-cyan-600">
-                            ₨{fee.admissionFee.toLocaleString()}
+                            ৳{fee.admissionFee?.toLocaleString() || '0'}
                           </TableCell>
                           <TableCell className="font-semibold text-green-600">
-                            ₨{fee.tuitionFee.toLocaleString()}
+                            ৳{fee.tuitionFee?.toLocaleString() || '0'}
+                          </TableCell>
+                          <TableCell className="font-semibold text-orange-600">
+                            ৳{fee.dinningFee?.toLocaleString() || '0'}
                           </TableCell>
                           <TableCell className="font-semibold text-blue-600">
-                            ₨{fee.examFee.toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-slate-600">
-                            ₨{fee.otherFees.toLocaleString()}
-                          </TableCell>
-                          <TableCell className="font-bold text-slate-900">
-                            ₨{annualTotal.toLocaleString()}
+                            ৳{fee.examFee?.toLocaleString() || '0'}
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-2">

@@ -6,7 +6,35 @@ export async function GET() {
   try {
     await connectDB();
     const reviews = await Review.find({ isActive: true }).sort({ order: 1 });
-    return NextResponse.json(reviews);
+    
+    // Calculate rating distribution
+    const ratingDistribution = {
+      5: 0,
+      4: 0,
+      3: 0,
+      2: 0,
+      1: 0,
+    };
+    
+    reviews.forEach((review) => {
+      if (review.rating >= 1 && review.rating <= 5) {
+        ratingDistribution[review.rating as keyof typeof ratingDistribution]++;
+      }
+    });
+    
+    const totalReviews = reviews.length;
+    const averageRating = totalReviews > 0 
+      ? (reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews).toFixed(1)
+      : "0.0";
+    
+    return NextResponse.json({
+      reviews,
+      stats: {
+        ratingDistribution,
+        totalReviews,
+        averageRating,
+      },
+    });
   } catch (error: unknown) {
     console.error("Error fetching reviews:", error);
     return NextResponse.json(

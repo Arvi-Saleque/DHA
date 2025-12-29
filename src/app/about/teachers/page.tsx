@@ -96,24 +96,40 @@ export default function TeachersPage() {
     }
   };
 
-  // Default fallback data
-  const defaultData: FacultyData = {
-    pageTitle: "Our Distinguished Teachers",
-    pageSubtitle: "Learn from experienced scholars dedicated to your success",
-    sectionTitle: "Faculty Members",
-    sectionDescription: "Dedicated educators combining traditional scholarship with modern teaching methods",
-    categories: [
-      { name: "Senior Faculty", order: 0 },
-      { name: "Quran Department", order: 1 },
-      { name: "Islamic Studies", order: 2 },
-      { name: "Administration", order: 3 },
-    ],
-    teachers: [],
-    quote: "A teacher can never truly teach unless he is still learning himself",
-    quoteAuthor: "Our educators are lifelong learners committed to continuous growth",
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-cyan-600 mx-auto mb-4"></div>
+          <p className="text-slate-600 text-lg">Loading Faculty Information...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const data = facultyData || defaultData;
+  if (!facultyData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+        <div className="text-center px-4">
+          <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            No Faculty Information Available
+          </h3>
+          <p className="text-slate-600 mb-6">
+            The faculty information has not been set up yet.
+          </p>
+          <Link href="/about">
+            <Button className="bg-cyan-600 hover:bg-cyan-700">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to About
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const data = facultyData;
 
   // Get teachers filtered by active category
   const getFilteredTeachers = () => {

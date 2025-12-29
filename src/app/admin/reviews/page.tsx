@@ -52,7 +52,7 @@ export default function AdminReviewsPage() {
       const response = await fetch("/api/reviews");
       if (response.ok) {
         const data = await response.json();
-        setReviews(data);
+        setReviews(data.reviews || []);
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);

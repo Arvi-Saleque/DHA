@@ -140,61 +140,6 @@ export default function CurriculumPage() {
         </div>
       </section>
 
-      {/* Curriculum Highlights */}
-      <section className="container mx-auto px-4 mb-12">
-        <div className="text-center mb-8">
-          <Badge variant="outline" className="mb-4">
-            <Target className="w-3 h-3 mr-1" />
-            Our Focus
-          </Badge>
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">
-            Curriculum Highlights
-          </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            A balanced approach to Islamic and contemporary education
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 bg-gradient-to-br from-white to-slate-50">
-            <CardContent className="p-6 text-center">
-              <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Quranic Studies</h3>
-              <p className="text-sm text-slate-600">Memorization, Tajweed, and Tafsir</p>
-            </CardContent>
-          </Card>
-          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 bg-gradient-to-br from-white to-slate-50">
-            <CardContent className="p-6 text-center">
-              <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Target className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Islamic Jurisprudence</h3>
-              <p className="text-sm text-slate-600">Fiqh, Hadith, and Islamic Law</p>
-            </CardContent>
-          </Card>
-          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 bg-gradient-to-br from-white to-slate-50">
-            <CardContent className="p-6 text-center">
-              <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Users className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Arabic Language</h3>
-              <p className="text-sm text-slate-600">Grammar, Literature, and Conversation</p>
-            </CardContent>
-          </Card>
-          <Card className="border-none shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 bg-gradient-to-br from-white to-slate-50">
-            <CardContent className="p-6 text-center">
-              <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Award className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">General Education</h3>
-              <p className="text-sm text-slate-600">Mathematics, Science, and Social Studies</p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
       {/* Main Content - Curriculum by Category */}
       <section className="container mx-auto px-4 pb-20">
         <Card className="border-none shadow-xl">
@@ -248,7 +193,7 @@ export default function CurriculumPage() {
                           />
 
                           {/* Action Buttons */}
-                          <div className="p-6 bg-slate-50 flex justify-center">
+                          <div className="py-3 bg-slate-50 flex justify-center">
                             <Button
                               className="bg-cyan-600 hover:bg-cyan-700"
                               onClick={() => handleDownload(group.curriculum!.pdfUrl)}
@@ -331,6 +276,8 @@ export default function CurriculumPage() {
           </Card>
         </div>
       </section>
+
+      
     </div>
   );
 }
