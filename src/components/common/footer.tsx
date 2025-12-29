@@ -348,7 +348,7 @@ export default function Footer() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex justify-center items-center">
             <p className="text-sm text-muted-foreground text-center">
-              © {new Date().getFullYear()} {footerSettings?.copyrightText || "All rights reserved."}
+              © {new Date().getFullYear()} {footerSettings?.copyrightText || "All rights reserved."} | Developed by <a href="https://efftytech.com" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-600 transition-colors">Effty Tech</a>
             </p>
           </div>
         </div>
