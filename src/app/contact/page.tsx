@@ -196,7 +196,7 @@ export default function ContactPage() {
 
       {/* Contact Info Cards */}
       <section className="container mx-auto px-4 -mt-16 relative z-10 mb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {data.contactInfo
             .sort((a, b) => a.order - b.order)
             .map((info, index) => {
@@ -207,17 +207,17 @@ export default function ContactPage() {
                   key={index}
                   className="border-none shadow-lg bg-white hover:shadow-xl transition-shadow"
                 >
-                  <CardContent className="p-6">
+                  <CardContent className="p-3 sm:p-6">
                     <div
-                      className={`w-12 h-12 ${colors.bg} rounded-full flex items-center justify-center mb-4`}
+                      className={`w-8 h-8 sm:w-12 sm:h-12 ${colors.bg} rounded-full flex items-center justify-center mb-2 sm:mb-4`}
                     >
-                      <Icon className={`w-6 h-6 ${colors.color}`} />
+                      <Icon className={`w-4 h-4 sm:w-6 sm:h-6 ${colors.color}`} />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">
+                    <h3 className="text-xs sm:text-lg font-bold text-slate-900 mb-1 sm:mb-2">
                       {info.title}
                     </h3>
                     {info.details.map((detail, idx) => (
-                      <p key={idx} className="text-sm text-slate-600">
+                      <p key={idx} className="text-[10px] sm:text-sm text-slate-600 leading-tight sm:leading-normal">
                         {detail}
                       </p>
                     ))}
