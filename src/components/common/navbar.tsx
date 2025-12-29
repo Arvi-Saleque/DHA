@@ -195,12 +195,11 @@ export default function Navbar() {
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] flex flex-col">
                 <SheetHeader>
                   <SheetTitle>Menu</SheetTitle>
                 </SheetHeader>
-                <div className="mt-6 flex flex-col space-y-3">
-                  {navigationItems.map((item, index) => (
+                <div className="mt-6 flex flex-col space-y-3 overflow-y-auto flex-1 pr-2">{navigationItems.map((item, index) => (
                     <div key={index}>
                       {item.items ? (
                         // Collapsible dropdown for mobile with sliding animation
