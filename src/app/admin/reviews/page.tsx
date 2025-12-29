@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { GripVertical, Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { GripVertical, Plus, Trash2, Eye, EyeOff, UserCircle2 } from "lucide-react";
 import ImageUploader from "@/components/common/ImageUploader";
 
 interface Review {
@@ -15,6 +15,7 @@ interface Review {
   name: string;
   relation: string;
   image: string;
+  gender?: string;
   rating: number;
   review: string;
   order: number;
@@ -49,7 +50,7 @@ export default function AdminReviewsPage() {
 
   const fetchReviews = async () => {
     try {
-      const response = await fetch("/api/reviews");
+      const response = await fetch("/api/reviews?admin=true");
       if (response.ok) {
         const data = await response.json();
         setReviews(data.reviews || []);
@@ -152,6 +153,24 @@ export default function AdminReviewsPage() {
     }
   };
 
+  const toggleActive = async (review: Review) => {
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...review, isActive: !review.isActive }),
+      });
+
+      if (response.ok) {
+        fetchReviews();
+        alert(review.isActive ? "Review deactivated" : "Review approved and activated!");
+      }
+    } catch (error) {
+      console.error("Error toggling review status:", error);
+      alert("Failed to update review status");
+    }
+  };
+
   const openAddModal = () => {
     setEditingReview({
       name: "",
@@ -187,6 +206,11 @@ export default function AdminReviewsPage() {
         <div>
           <h1 className="text-3xl font-bold">Reviews Management</h1>
           <p className="text-gray-600 mt-1">Manage parent and guardian testimonials</p>
+          {reviews.filter(r => !r.isActive).length > 0 && (
+            <Badge className="mt-2 bg-amber-500">
+              {reviews.filter(r => !r.isActive).length} Pending Approval
+            </Badge>
+          )}
         </div>
         <div className="flex gap-2">
           <Button 
@@ -273,16 +297,26 @@ export default function AdminReviewsPage() {
 
       <div className="grid grid-cols-1 gap-4">
         {reviews.map((review) => (
-          <Card key={review._id} className="p-4">
+          <Card key={review._id} className={`p-4 ${!review.isActive ? 'border-2 border-amber-300 bg-amber-50' : ''}`}>
             <div className="flex items-start gap-4">
               <GripVertical className="w-5 h-5 text-gray-400 mt-2 cursor-move" />
               
               <div className="flex-shrink-0">
-                <img
-                  src={review.image}
-                  alt={review.name}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
-                />
+                {review.image ? (
+                  <img
+                    src={review.image}
+                    alt={review.name}
+                    className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                  />
+                ) : (
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center border-2 border-gray-200 ${
+                    review.gender === "female" ? "bg-pink-100" : "bg-blue-100"
+                  }`}>
+                    <UserCircle2 className={`w-12 h-12 ${
+                      review.gender === "female" ? "text-pink-400" : "text-blue-400"
+                    }`} />
+                  </div>
+                )}
               </div>
 
               <div className="flex-1">
@@ -308,6 +342,26 @@ export default function AdminReviewsPage() {
                 <p className="text-sm text-gray-700 line-clamp-2">{review.review}</p>
 
                 <div className="flex gap-2 mt-3">
+                  {!review.isActive && (
+                    <Button 
+                      onClick={() => toggleActive(review)} 
+                      size="sm" 
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      Approve
+                    </Button>
+                  )}
+                  {review.isActive && (
+                    <Button 
+                      onClick={() => toggleActive(review)} 
+                      size="sm" 
+                      variant="outline"
+                    >
+                      <EyeOff className="w-4 h-4 mr-1" />
+                      Deactivate
+                    </Button>
+                  )}
                   <Button onClick={() => openEditModal(review)} size="sm" variant="outline">
                     Edit
                   </Button>

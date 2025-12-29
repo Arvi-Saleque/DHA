@@ -21,7 +21,9 @@ interface CloudinaryImage {
 interface ImageUploaderProps {
   label?: string;
   value?: string;
-  onChange: (url: string) => void;
+  currentImage?: string; // Alias for value
+  onChange?: (url: string) => void;
+  onImageUpload?: (url: string) => void; // Alias for onChange
   folder?: string;
   accept?: string;
   maxSizeMB?: number;
@@ -31,7 +33,9 @@ interface ImageUploaderProps {
 export default function ImageUploader({
   label = "Upload Image",
   value = "",
+  currentImage,
   onChange,
+  onImageUpload,
   folder = "dha-uploads",
   accept = "image/*",
   maxSizeMB = 5,
@@ -43,6 +47,10 @@ export default function ImageUploader({
   const [cloudinaryImages, setCloudinaryImages] = useState<CloudinaryImage[]>([]);
   const [loadingGallery, setLoadingGallery] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Support both prop names
+  const imageUrl = currentImage || value;
+  const handleImageChange = onImageUpload || onChange || (() => {});
 
   const fetchCloudinaryImages = async () => {
     setLoadingGallery(true);
@@ -90,7 +98,7 @@ export default function ImageUploader({
       const data = await response.json();
 
       if (data.success) {
-        onChange(data.url);
+        handleImageChange(data.url);
       } else {
         // Show detailed error message from server
         const errorMessage = data.message || data.error || "Upload failed";
@@ -107,14 +115,14 @@ export default function ImageUploader({
   };
 
   const handleRemove = () => {
-    onChange("");
+    handleImageChange("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
   const handleSelectImage = (url: string) => {
-    onChange(url);
+    handleImageChange(url);
     setShowGallery(false);
   };
 
@@ -123,10 +131,10 @@ export default function ImageUploader({
       <Label>{label}</Label>
       
       <div className="flex flex-col gap-3">
-        {preview && value && (
+        {preview && imageUrl && (
           <div className="relative w-full max-w-md">
             <img
-              src={value}
+              src={imageUrl}
               alt="Preview"
               className="w-full h-48 object-cover rounded-lg border"
             />
