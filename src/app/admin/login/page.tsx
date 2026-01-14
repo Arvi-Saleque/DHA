@@ -14,10 +14,11 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
+  User,
 } from "lucide-react";
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,19 +30,19 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Implement actual login API call
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       if (response.ok) {
         const data = await response.json();
         // Store token and redirect to dashboard
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("adminToken", data.token);
+        localStorage.setItem("adminUser", JSON.stringify(data.user));
         window.location.href = "/admin/dashboard";
       } else {
         const errorData = await response.json();
@@ -95,19 +96,19 @@ export default function AdminLoginPage() {
                 </div>
               )}
 
-              {/* Email Field */}
+              {/* Username Field */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-700 font-medium">
-                  Email Address
+                <Label htmlFor="username" className="text-slate-700 font-medium">
+                  Username
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="admin@madrasa.edu"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="username"
+                    type="text"
+                    placeholder="adminDHA"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="pl-10 h-11"
                     required
                   />
@@ -177,68 +178,6 @@ export default function AdminLoginPage() {
                 )}
               </Button>
             </form>
-
-            {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-slate-500">
-                  Role-based access
-                </span>
-              </div>
-            </div>
-
-            {/* Role Badges */}
-            <div className="flex flex-wrap gap-2 justify-center">
-              <Badge
-                variant="outline"
-                className="bg-cyan-50 text-cyan-700 border-cyan-200"
-              >
-                Super Admin
-              </Badge>
-              <Badge
-                variant="outline"
-                className="bg-blue-50 text-blue-700 border-blue-200"
-              >
-                Teacher
-              </Badge>
-              <Badge
-                variant="outline"
-                className="bg-purple-50 text-purple-700 border-purple-200"
-              >
-                Accountant
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Footer Links */}
-        <div className="mt-6 text-center">
-          <Link
-            href="/"
-            className="text-sm text-slate-600 hover:text-cyan-600 transition-colors"
-          >
-            ← Back to Website
-          </Link>
-        </div>
-
-        {/* Security Notice */}
-        <Card className="mt-6 border-amber-200 bg-amber-50/50">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <Lock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-semibold text-amber-900 mb-1">
-                  Security Notice
-                </p>
-                <p className="text-xs text-amber-800">
-                  This is a secure area. All login attempts are monitored and
-                  logged. Unauthorized access is strictly prohibited.
-                </p>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>

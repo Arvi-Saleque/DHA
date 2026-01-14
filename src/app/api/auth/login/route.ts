@@ -3,22 +3,48 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { comparePassword, generateToken } from "@/lib/auth";
 
+// Hardcoded admin credentials
+const ADMIN_USERNAME = "adminDHA";
+const ADMIN_PASSWORD = "D!@23h2@%A23";
+
 export async function POST(request: NextRequest) {
   try {
-    await connectDB();
+    const { username, email, password } = await request.json();
 
-    const { email, password } = await request.json();
+    // Use username if provided, otherwise fall back to email for backward compatibility
+    const loginIdentifier = username || email;
 
     // Validation
-    if (!email || !password) {
+    if (!loginIdentifier || !password) {
       return NextResponse.json(
-        { success: false, message: "Email and password are required" },
+        { success: false, message: "Username and password are required" },
         { status: 400 }
       );
     }
 
-    // Find user
-    const user = await User.findOne({ email, isActive: true });
+    // Check hardcoded admin credentials first
+    if (loginIdentifier === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      const token = "admin-hardcoded-token-" + Date.now();
+      
+      return NextResponse.json({
+        success: true,
+        message: "Login successful",
+        token,
+        user: {
+          id: "admin",
+          name: "Administrator",
+          email: ADMIN_USERNAME,
+          role: "admin",
+          profileImage: null,
+        },
+      });
+    }
+
+    // If not hardcoded admin, try database authentication
+    await connectDB();
+
+    // Find user by email
+    const user = await User.findOne({ email: loginIdentifier, isActive: true });
     if (!user) {
       return NextResponse.json(
         { success: false, message: "Invalid credentials" },
