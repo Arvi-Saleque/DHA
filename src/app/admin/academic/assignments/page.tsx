@@ -327,7 +327,7 @@ export default function AssignmentsManagement() {
                         </TableCell>
                         <TableCell>{assignment.title}</TableCell>
                         <TableCell className="max-w-md">
-                          <div className="text-sm text-gray-600 line-clamp-2">
+                          <div className="text-sm text-gray-600 whitespace-pre-line">
                             {assignment.description || "No instructions"}
                           </div>
                         </TableCell>
@@ -375,7 +375,12 @@ export default function AssignmentsManagement() {
               {isEditing ? "Edit Assignment" : "Add New Assignment"}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} onKeyDown={(e) => {
+            // Prevent form submission on Enter key, except when in textarea
+            if (e.key === 'Enter' && !(e.target instanceof HTMLTextAreaElement)) {
+              e.preventDefault();
+            }
+          }}>
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
