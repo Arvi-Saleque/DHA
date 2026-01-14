@@ -206,7 +206,7 @@ export default function AssignmentsPage() {
                           </div>
                         </TableCell>
                         <TableCell className="max-w-md">
-                          <div className="text-sm text-slate-600 line-clamp-2">
+                          <div className="text-sm text-slate-600 whitespace-pre-line">
                             {assignment.description || "No instructions"}
                           </div>
                         </TableCell>
