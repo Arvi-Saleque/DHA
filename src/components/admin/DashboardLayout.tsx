@@ -1,8 +1,8 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -130,14 +130,36 @@ const menuItems: MenuItem[] = [
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [adminUser, setAdminUser] = useState<any>(null);
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check authentication
+    const token = localStorage.getItem("adminToken");
+    const userStr = localStorage.getItem("adminUser");
+    
+    if (!token) {
+      router.push("/admin/login");
+      return;
+    }
+    
+    if (userStr) {
+      try {
+        setAdminUser(JSON.parse(userStr));
+      } catch (e) {
+        console.error("Error parsing admin user:", e);
+      }
+    }
+  }, [router]);
 
   const toggleSubmenu = (title: string) => {
     setOpenSubmenu(openSubmenu === title ? null : title);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminUser");
     window.location.href = "/admin/login";
   };
 
@@ -237,12 +259,18 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <div className="h-16 border-t border-gray-200 px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-cyan-100 text-cyan-600">SA</AvatarFallback>
+              <AvatarImage src={adminUser?.profileImage || ""} />
+              <AvatarFallback className="bg-cyan-100 text-cyan-600">
+                {adminUser?.name ? adminUser.name.charAt(0).toUpperCase() : "A"}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">Super Admin</p>
-              <p className="text-xs text-gray-500 truncate">admin@madrasa.edu</p>
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {adminUser?.name || "Admin"}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {adminUser?.email || "admin"}
+              </p>
             </div>
           </div>
           <button
