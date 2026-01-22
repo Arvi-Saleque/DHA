@@ -98,10 +98,10 @@ export async function POST(req: NextRequest) {
       { message: 'Absence created successfully', absence },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating absence:', error);
     return NextResponse.json(
-      { error: 'Failed to create absence' },
+      { error: error.message || 'Failed to create absence' },
       { status: 500 }
     );
   }
@@ -151,9 +151,6 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json(
       { error: 'Failed to update absence' },
       { status: 500 }
-    );
-  }
-}
     );
   }
 }

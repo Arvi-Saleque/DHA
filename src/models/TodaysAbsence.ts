@@ -22,20 +22,6 @@ const todaysAbsenceSchema = new mongoose.Schema(
     className: {
       type: String,
       required: true,
-      enum: [
-        'Play Group',
-        'Nursery',
-        'Class 1',
-        'Class 2',
-        'Class 3',
-        'Class 4',
-        'Class 5',
-        'Class 6',
-        'Class 7',
-        'Class 8',
-        'Class 9',
-        'Class 10',
-      ],
       index: true,
     },
     students: [studentAbsenceSchema],
@@ -57,11 +43,15 @@ const todaysAbsenceSchema = new mongoose.Schema(
 todaysAbsenceSchema.index({ date: -1, className: 1 });
 
 // Update totalAbsent before saving
-todaysAbsenceSchema.pre('save', function (next) {
+todaysAbsenceSchema.pre('save', function () {
   this.totalAbsent = this.students.length;
-  next();
 });
 
-const TodaysAbsence = mongoose.models.TodaysAbsence || mongoose.model('TodaysAbsence', todaysAbsenceSchema);
+// Delete existing model to avoid schema mismatch issues
+if (mongoose.models.TodaysAbsence) {
+  delete mongoose.models.TodaysAbsence;
+}
+
+const TodaysAbsence = mongoose.model('TodaysAbsence', todaysAbsenceSchema);
 
 export default TodaysAbsence;
