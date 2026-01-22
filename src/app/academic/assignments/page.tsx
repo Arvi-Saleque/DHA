@@ -38,7 +38,7 @@ interface Assignment {
   class: string;
   title: string;
   description?: string;
-  deadline: string;
+  createdAt: string;
   teacherName: string;
 }
 
@@ -66,14 +66,16 @@ export default function AssignmentsPage() {
     }
   };
 
-  const filteredAssignments = assignments.filter((assignment) => {
-    const matchesSearch =
-      assignment.class.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      assignment.subject.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesClass =
-      filterClass === "all" || assignment.class === filterClass;
-    return matchesSearch && matchesClass;
-  });
+  const filteredAssignments = assignments
+    .filter((assignment) => {
+      const matchesSearch =
+        assignment.class.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        assignment.subject.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesClass =
+        filterClass === "all" || assignment.class === filterClass;
+      return matchesSearch && matchesClass;
+    })
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -179,7 +181,7 @@ export default function AssignmentsPage() {
                         Instructions
                       </TableHead>
                       <TableHead className="font-bold text-slate-900">
-                        Deadline
+                        Given Date
                       </TableHead>
                       <TableHead className="font-bold text-slate-900">
                         Teacher
@@ -213,7 +215,7 @@ export default function AssignmentsPage() {
                         <TableCell>
                           <div className="flex items-center gap-2 text-sm">
                             <Clock className="w-4 h-4 text-slate-400" />
-                            {new Date(assignment.deadline).toLocaleDateString(
+                            {new Date(assignment.createdAt).toLocaleDateString(
                               "en-US",
                               {
                                 month: "short",

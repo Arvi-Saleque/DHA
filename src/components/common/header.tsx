@@ -41,13 +41,13 @@ const features = [
   {
     href: "/next-exam",
     icon: PencilIcon,
-    title: "Next exam",
+    title: "Next Exam",
     description: "Check the schedule for the upcoming exam",
   },
   {
     href: "/absences",
     icon: UserXIcon,
-    title: "Today's absence",
+    title: "Today's Absence",
     description: "See the list of absent students today",
   },
 ];
