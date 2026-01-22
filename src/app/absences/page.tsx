@@ -122,18 +122,17 @@ export default function AbsencesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
-      <section className="mb-12 relative h-[280px] sm:h-[320px] bg-gradient-to-br from-red-500 via-red-600 to-rose-700 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
+      <section className="mb-20 relative h-[300px] bg-cyan-600 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20"></div>
 
         <div className="relative container mx-auto px-4 h-full flex flex-col justify-center items-center text-white text-center">
           <Link href="/">
             <Button
               variant="ghost"
-              className="absolute top-4 left-4 sm:top-6 sm:left-6 text-white hover:bg-white/20"
+              className="absolute top-6 left-6 text-white hover:bg-white/20"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Back to Home</span>
-              <span className="sm:hidden">Back</span>
+              Back to Home
             </Button>
           </Link>
 
@@ -142,69 +141,26 @@ export default function AbsencesPage() {
             className="mb-4 bg-white/20 backdrop-blur-sm text-white border-white/30"
           >
             <UserX className="w-3 h-3 mr-1" />
-            Attendance Portal
+            Academic Portal
           </Badge>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 drop-shadow-lg">
-            Absence Records
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 drop-shadow-lg">
+            Student Absences
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-red-100 max-w-2xl drop-shadow-md">
+          <p className="text-lg md:text-xl text-cyan-50 max-w-2xl drop-shadow-md">
             Daily student absence records for all classes
           </p>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="container mx-auto px-4 pb-20 -mt-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <Card className="bg-white shadow-lg border-0">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="p-3 bg-red-100 rounded-xl">
-                <Calendar className="w-6 h-6 text-red-600" />
-              </div>
-              <div>
-                <p className="text-sm text-slate-500">Available Dates</p>
-                <p className="text-2xl font-bold text-slate-900">
-                  {availableDates.length}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-white shadow-lg border-0">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <GraduationCap className="w-6 h-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-slate-500">Total Records</p>
-                <p className="text-2xl font-bold text-slate-900">
-                  {filteredAbsences.length}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-white shadow-lg border-0">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="p-3 bg-rose-100 rounded-xl">
-                <Users className="w-6 h-6 text-rose-600" />
-              </div>
-              <div>
-                <p className="text-sm text-slate-500">Absent Students</p>
-                <p className="text-2xl font-bold text-slate-900">
-                  {getTotalAbsentStudents()}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
+      <section className="container mx-auto px-4 pb-20">
         {/* Filters */}
-        <Card className="mb-6 border-0 shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <div className="flex items-center gap-2 text-slate-700">
-                <Filter className="w-5 h-5" />
-                <span className="font-medium">Filters:</span>
+        <Card className="mb-6 border-none shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+              <div className="flex items-center gap-2 text-slate-700 min-w-fit">
+                <Filter className="w-5 h-5 text-cyan-600" />
+                <span className="font-semibold">Filters:</span>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 flex-1">
                 <Select value={selectedDate} onValueChange={setSelectedDate}>
@@ -241,18 +197,18 @@ export default function AbsencesPage() {
         </Card>
 
         {/* Absence Records */}
-        <Card className="border-0 shadow-xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-slate-800 to-slate-900 text-white">
-            <CardTitle className="text-xl font-bold flex items-center gap-2">
-              <UserX className="w-5 h-5" />
-              Absence List
+        <Card className="border-none shadow-xl overflow-hidden">
+          <CardHeader className="border-b bg-slate-50/50">
+            <CardTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <UserX className="w-6 h-6 text-cyan-600" />
+              Absence Records
             </CardTitle>
           </CardHeader>
 
           <CardContent className="p-0">
             {loading ? (
               <div className="flex items-center justify-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin text-red-600" />
+                <Loader2 className="h-8 w-8 animate-spin text-cyan-600" />
                 <span className="ml-3 text-slate-600">
                   Loading absence records...
                 </span>
@@ -275,7 +231,7 @@ export default function AbsencesPage() {
                   <div key={absence._id} className="bg-white">
                     {/* Record Header */}
                     <div
-                      className="p-4 sm:p-5 cursor-pointer hover:bg-slate-50 transition-colors"
+                      className="p-5 cursor-pointer hover:bg-slate-50 transition-colors"
                       onClick={() =>
                         setExpandedRecord(
                           expandedRecord === absence._id ? null : absence._id
@@ -284,8 +240,8 @@ export default function AbsencesPage() {
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-4">
-                          <div className="p-3 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl text-white">
-                            <Calendar className="w-5 h-5" />
+                          <div className="p-3 bg-cyan-100 rounded-xl">
+                            <Calendar className="w-6 h-6 text-cyan-600" />
                           </div>
                           <div>
                             <h3 className="font-semibold text-slate-900 text-lg">
@@ -304,8 +260,8 @@ export default function AbsencesPage() {
                         </div>
                         <div className="flex items-center gap-3">
                           <Badge
-                            variant="destructive"
-                            className="bg-red-100 text-red-700 hover:bg-red-100"
+                            variant="secondary"
+                            className="bg-orange-100 text-orange-700 hover:bg-orange-100"
                           >
                             <Users className="w-3 h-3 mr-1" />
                             {absence.totalAbsent} Absent
@@ -313,7 +269,7 @@ export default function AbsencesPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-slate-500"
+                            className="text-cyan-600 hover:text-cyan-700 hover:bg-cyan-50"
                           >
                             {expandedRecord === absence._id
                               ? "Hide Details"
@@ -325,7 +281,7 @@ export default function AbsencesPage() {
 
                     {/* Expanded Student List */}
                     {expandedRecord === absence._id && (
-                      <div className="px-4 sm:px-5 pb-5 bg-slate-50">
+                      <div className="px-5 pb-5 bg-slate-50">
                         <div className="rounded-lg border border-slate-200 overflow-hidden bg-white">
                           <Table>
                             <TableHeader>
@@ -345,7 +301,7 @@ export default function AbsencesPage() {
                               {absence.students.map((student, index) => (
                                 <TableRow
                                   key={index}
-                                  className="hover:bg-red-50/50"
+                                  className="hover:bg-slate-50"
                                 >
                                   <TableCell className="font-medium text-slate-500">
                                     {index + 1}
