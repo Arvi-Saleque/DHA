@@ -56,7 +56,7 @@ const navigationItems = [
       { title: "Curriculum Overview", href: "/academic/curriculum" },
       { title: "Syllabus", href: "/academic/syllabus" },
       { title: "Daily Assignments", href: "/academic/assignments" },
-      { title: "Exam Routing", href: "/academic/exams" },
+      { title: "Exam Routine", href: "/academic/exams" },
       { title: "Class Routine", href: "/academic/routine" },
       { title: "Academic Calendar", href: "/academic/calendar" },
       { title: "Scholarship", href: "/academic/scholarship" },
