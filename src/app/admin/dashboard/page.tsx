@@ -313,11 +313,13 @@ export default function AdminDashboard() {
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                       <Button
                         onClick={() => {
+                          const to = encodeURIComponent(selectedMessage.email);
                           const subject = encodeURIComponent(`Re: ${selectedMessage.subject}`);
                           const body = encodeURIComponent(
                             `Hi ${selectedMessage.name},\n\nThank you for contacting us.\n\n---\nOriginal Message:\n${selectedMessage.message}`
                           );
-                          window.location.href = `mailto:${selectedMessage.email}?subject=${subject}&body=${body}`;
+                          // Open Gmail compose directly
+                          window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`, '_blank');
                         }}
                         className="flex-1 bg-blue-600 hover:bg-blue-700 text-sm sm:text-base"
                       >

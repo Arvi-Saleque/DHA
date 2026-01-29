@@ -214,7 +214,7 @@ export default function SyllabusManagement() {
                 <PdfUploader
                   label="Syllabus PDF"
                   value={formData.pdfUrl}
-                  onChange={(url) => setFormData({ ...formData, pdfUrl: url })}
+                  onChange={(url, pages) => setFormData({ ...formData, pdfUrl: url, totalPages: pages || formData.totalPages })}
                   folder="syllabus"
                 />
               </div>

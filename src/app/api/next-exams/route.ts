@@ -8,7 +8,7 @@ export async function GET() {
     await connectDB();
 
     const exams = await NextExam.find({ isActive: true })
-      .sort({ date: 1, createdAt: 1 })
+      .sort({ className: 1, createdAt: 1 })
       .lean();
 
     return NextResponse.json({
@@ -30,9 +30,9 @@ export async function POST(request: Request) {
     await connectDB();
 
     const body = await request.json();
-    const { date, subject, time, duration, room, grade } = body;
+    const { className, examName, pdfUrl, totalPages } = body;
 
-    if (!date || !subject || !time || !duration || !room || !grade) {
+    if (!className || !examName || !pdfUrl) {
       return NextResponse.json(
         { success: false, message: "Missing required fields" },
         { status: 400 }
@@ -40,20 +40,18 @@ export async function POST(request: Request) {
     }
 
     const exam = await NextExam.create({
-      date,
-      subject,
-      time,
-      duration,
-      room,
-      grade,
+      className,
+      examName,
+      pdfUrl,
+      totalPages: totalPages || 15,
       isActive: true,
     }) as any;
     
     // Send automatic notification to subscribers
     await sendAutomaticNotification({
       type: 'academic',
-      title: 'New Exam Scheduled',
-      message: `${subject} exam scheduled for ${grade} on ${new Date(date).toLocaleDateString()} at ${time}.`,
+      title: 'New Exam Routine Published',
+      message: `${examName} routine has been published for ${className}.`,
       link: `/next-exam`
     });
 
@@ -85,17 +83,15 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { date, subject, time, duration, room, grade } = body;
+    const { className, examName, pdfUrl, totalPages } = body;
 
     const exam = await NextExam.findByIdAndUpdate(
       id,
       {
-        date,
-        subject,
-        time,
-        duration,
-        room,
-        grade,
+        className,
+        examName,
+        pdfUrl,
+        totalPages: totalPages || 15,
       },
       { new: true, runValidators: true }
     );
@@ -124,6 +120,17 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     await connectDB();
+
+    // Check if this is a delete all request
+    const body = await request.json().catch(() => null);
+    if (body && body.deleteAll === true) {
+      const result = await NextExam.deleteMany({});
+      return NextResponse.json({ 
+        success: true,
+        message: 'All exam routines deleted successfully',
+        deletedCount: result.deletedCount 
+      });
+    }
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");

@@ -8,7 +8,7 @@ import { Upload, X, Loader2, FileText } from "lucide-react";
 interface PdfUploaderProps {
   label?: string;
   value?: string;
-  onChange: (url: string) => void;
+  onChange: (url: string, pages?: number) => void;
   folder?: string;
   maxSizeMB?: number;
 }
@@ -56,7 +56,7 @@ export default function PdfUploader({
       const data = await response.json();
 
       if (data.success) {
-        onChange(data.url);
+        onChange(data.url, data.pages);
       } else {
         setError(data.error || "Upload failed");
       }

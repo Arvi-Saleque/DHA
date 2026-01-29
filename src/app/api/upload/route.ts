@@ -25,8 +25,9 @@ export async function POST(request: NextRequest) {
 
     // Determine resource type based on file type
     const isPDF = file.type === "application/pdf";
-    // CRITICAL: Use 'auto' for PDFs so Cloudinary treats them as images, enabling page transformation
-    const resourceType = isPDF ? "auto" : "image";
+    // For PDFs: Use "image" resource_type to enable page transformations (pg_X)
+    // This allows Cloudinary to convert PDF pages to images
+    const resourceType = isPDF ? "image" : "image";
 
     // Upload to Cloudinary with appropriate settings
     const uploadOptions: any = {
@@ -36,10 +37,8 @@ export async function POST(request: NextRequest) {
       type: "upload",
     };
 
-    // For PDFs, Cloudinary will automatically detect and allow page extraction
-    if (isPDF) {
-      uploadOptions.format = "pdf";
-    }
+    // For PDFs uploaded as images, Cloudinary will allow page extraction
+    // The PDF will be stored and can be accessed with pg_1, pg_2, etc.
 
     const result = await cloudinary.uploader.upload(dataURI, uploadOptions);
 
@@ -48,6 +47,7 @@ export async function POST(request: NextRequest) {
       url: result.secure_url,
       publicId: result.public_id,
       resourceType: resourceType,
+      pages: result.pages || 1, // Cloudinary returns page count for PDFs
     });
   } catch (error: any) {
     console.error("Upload error:", error);
