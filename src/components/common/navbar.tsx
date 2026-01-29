@@ -45,7 +45,7 @@ const navigationItems = [
       { title: "About", href: "/about" },
       { title: "Mission & Vision", href: "/about/mission-vission" },
       { title: "Chairman Message", href: "/about/chairman-message" },
-      { title: "Teachers Panel", href: "/about/teachers" },
+      { title: "Teachers' Panel", href: "/about/teachers" },
       { title: "Committee", href: "/about/committee" },
     ],
   },
@@ -55,7 +55,7 @@ const navigationItems = [
     items: [
       { title: "Curriculum Overview", href: "/academic/curriculum" },
       { title: "Syllabus", href: "/academic/syllabus" },
-      { title: "Daily Assignments", href: "/academic/assignments" },
+      { title: "Today's Homework", href: "/academic/assignments" },
       { title: "Exam Routine", href: "/academic/exams" },
       { title: "Class Routine", href: "/academic/routine" },
       { title: "Academic Calendar", href: "/academic/calendar" },

@@ -102,10 +102,10 @@ export default function AssignmentsPage() {
             Academic Portal
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold mb-3 drop-shadow-lg">
-            Assignments
+            Homeworks 
           </h1>
           <p className="text-lg md:text-xl text-cyan-50 max-w-2xl drop-shadow-md">
-            View and manage all your academic assignments
+            View and manage all your academic Homework
           </p>
         </div>
       </section>

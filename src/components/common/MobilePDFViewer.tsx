@@ -2,6 +2,7 @@
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation, Zoom } from 'swiper/modules';
+import { useState } from 'react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
@@ -13,9 +14,13 @@ interface MobilePDFViewerProps {
 }
 
 export default function MobilePDFViewer({ pdfUrl, totalPages = 15 }: MobilePDFViewerProps) {
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+
   // Extract the Public ID from Cloudinary URL
   const getPublicId = (url: string) => {
     if (!url) return null;
+    
+    // Handle different Cloudinary URL formats
     const parts = url.split('/upload/');
     if (parts.length < 2) return null;
     
@@ -24,7 +29,7 @@ export default function MobilePDFViewer({ pdfUrl, totalPages = 15 }: MobilePDFVi
     // Remove version number (e.g., v17668...) if present
     path = path.replace(/v\d+\//, ''); 
     // Remove extension (.pdf)
-    path = path.replace('.pdf', ''); 
+    path = path.replace(/\.pdf$/i, ''); 
     
     return path;
   };
@@ -36,6 +41,7 @@ export default function MobilePDFViewer({ pdfUrl, totalPages = 15 }: MobilePDFVi
     return (
       <div className="text-center p-10 bg-slate-100 dark:bg-slate-900 rounded-lg">
         <p className="text-slate-600 dark:text-slate-400">Invalid PDF URL</p>
+        <p className="text-xs text-slate-400 mt-2">URL: {pdfUrl}</p>
       </div>
     );
   }
@@ -43,8 +49,18 @@ export default function MobilePDFViewer({ pdfUrl, totalPages = 15 }: MobilePDFVi
   // Generate pages array
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
+  // Generate image URL for a specific page
+  const getPageImageUrl = (page: number) => {
+    // Cloudinary PDF to image transformation
+    return `https://res.cloudinary.com/${cloudName}/image/upload/pg_${page}/${publicId}.jpg`;
+  };
+
+  const handleImageError = (page: number) => {
+    setImageErrors(prev => new Set(prev).add(page));
+  };
+
   return (
-    <div className="w-full h-screen flex flex-col">
+    <div className="w-full min-h-[500px] md:min-h-[700px] flex flex-col bg-slate-100">
       <style jsx global>{`
         @media (max-width: 768px) {
           .swiper-button-next,
@@ -65,6 +81,10 @@ export default function MobilePDFViewer({ pdfUrl, totalPages = 15 }: MobilePDFVi
         .swiper-pagination-bullet {
           margin: 0 4px !important;
         }
+        .swiper-button-next,
+        .swiper-button-prev {
+          color: #0891b2 !important;
+        }
       `}</style>
       <div className="flex-1 overflow-hidden">
         <Swiper
@@ -81,13 +101,20 @@ export default function MobilePDFViewer({ pdfUrl, totalPages = 15 }: MobilePDFVi
         >
           {pages.map((page) => (
             <SwiperSlide key={page} className="!p-0 !m-0">
-              <div className="swiper-zoom-container w-full h-full">
-                <img 
-                  src={`https://res.cloudinary.com/${cloudName}/image/upload/w_2400,q_auto:best,f_auto,dpr_2.0/pg_${page}/${publicId}.jpg`}
-                  alt={`Page ${page}`}
-                  className="w-full h-full object-cover"
-                  loading={page <= 2 ? "eager" : "lazy"}
-                />
+              <div className="swiper-zoom-container w-full h-full flex items-center justify-center bg-slate-100 p-4">
+                {imageErrors.has(page) ? (
+                  <div className="text-center text-slate-500">
+                    <p>Page {page} could not be loaded</p>
+                  </div>
+                ) : (
+                  <img 
+                    src={getPageImageUrl(page)}
+                    alt={`Page ${page}`}
+                    className="max-w-full max-h-full object-contain shadow-lg"
+                    loading={page <= 2 ? "eager" : "lazy"}
+                    onError={() => handleImageError(page)}
+                  />
+                )}
               </div>
             </SwiperSlide>
           ))}

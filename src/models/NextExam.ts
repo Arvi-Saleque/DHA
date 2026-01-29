@@ -1,47 +1,22 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose from "mongoose";
 
-export interface INextExam extends Document {
-  date: Date;
-  subject: string;
-  time: string;
-  duration: string;
-  room: string;
-  grade: string;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const NextExamSchema: Schema = new Schema(
+const NextExamSchema = new mongoose.Schema(
   {
-    date: {
-      type: Date,
-      required: [true, "Date is required"],
-    },
-    subject: {
+    className: {
       type: String,
-      required: [true, "Subject is required"],
-      trim: true,
+      required: true,
     },
-    time: {
+    examName: {
       type: String,
-      required: [true, "Time is required"],
-      trim: true,
+      required: true,
     },
-    duration: {
+    pdfUrl: {
       type: String,
-      required: [true, "Duration is required"],
-      trim: true,
+      required: true,
     },
-    room: {
-      type: String,
-      required: [true, "Room is required"],
-      trim: true,
-    },
-    grade: {
-      type: String,
-      required: [true, "Grade is required"],
-      trim: true,
+    totalPages: {
+      type: Number,
+      default: 15,
     },
     isActive: {
       type: Boolean,
@@ -53,5 +28,4 @@ const NextExamSchema: Schema = new Schema(
   }
 );
 
-export default mongoose.models.NextExam ||
-  mongoose.model<INextExam>("NextExam", NextExamSchema);
+export default mongoose.models.NextExam || mongoose.model("NextExam", NextExamSchema);
