@@ -162,7 +162,7 @@ export default function Header() {
                   </div>
 
                   {/* Main Title */}
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-white">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-white font-[family-name:var(--font-bengali-alinur)]">
                     {slide.title.split(/\\n|\n/).map((line, i) => (
                       <span key={i}>
                         {line}
@@ -172,7 +172,7 @@ export default function Header() {
                   </h1>
 
                   {/* Description */}
-                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 px-2 sm:px-0">
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 px-2 sm:px-0 font-[family-name:var(--font-bengali-Shadhinata)]">
                     {slide.description.split(/\\n|\n/).map((line, i) => (
                       <span key={i}>
                         {line}

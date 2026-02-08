@@ -284,7 +284,7 @@ export default function Home() {
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
                 {aboutUsData.title}
               </h2>
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed text-justify hyphens-auto">
+              <p className="text-lg sm:text-xl text-slate-600 leading-relaxed text-justify hyphens-auto font-[family-name:var(--font-bengali-sadhinata)]">
                 {aboutUsData.description.split('\n').map((line, i) => (
                   <span key={i}>
                     {line}
@@ -292,11 +292,7 @@ export default function Home() {
                   </span>
                 ))}
               </p>
-              {aboutUsData.subtitle && (
-                <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
-                  {aboutUsData.subtitle}
-                </p>
-              )}
+              
               
               {/* Key Highlights */}
               {aboutUsData.features && aboutUsData.features.length > 0 && (
