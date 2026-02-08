@@ -172,6 +172,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Alinur Banglaborno', sans-serif;
   }
 }
 
