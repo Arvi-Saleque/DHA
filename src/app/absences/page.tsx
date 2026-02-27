@@ -30,6 +30,7 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 
 interface Student {
   studentName: string;
@@ -69,6 +70,8 @@ export default function AbsencesPage() {
   const [selectedClass, setSelectedClass] = useState<string>("All Classes");
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [expandedRecord, setExpandedRecord] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   useEffect(() => {
     fetchAbsences();
@@ -96,6 +99,24 @@ export default function AbsencesPage() {
       selectedClass === "All Classes" || absence.className === selectedClass;
     return matchesDate && matchesClass;
   });
+
+  // Paginate
+  const totalItems = filteredAbsences.length;
+  const paginatedAbsences = filteredAbsences.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to page 1 when filters change
+  const handleDateChange = (value: string) => {
+    setSelectedDate(value);
+    setCurrentPage(1);
+  };
+
+  const handleClassChange = (value: string) => {
+    setSelectedClass(value);
+    setCurrentPage(1);
+  };
 
   // Get unique classes from absences for filter
   const availableClasses = [
@@ -163,7 +184,7 @@ export default function AbsencesPage() {
                 <span className="font-semibold">Filters:</span>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 flex-1">
-                <Select value={selectedDate} onValueChange={setSelectedDate}>
+                <Select value={selectedDate} onValueChange={handleDateChange}>
                   <SelectTrigger className="w-full sm:w-[200px] bg-white">
                     <Calendar className="w-4 h-4 mr-2 text-slate-400" />
                     <SelectValue placeholder="Select Date" />
@@ -178,7 +199,7 @@ export default function AbsencesPage() {
                   </SelectContent>
                 </Select>
 
-                <Select value={selectedClass} onValueChange={setSelectedClass}>
+                <Select value={selectedClass} onValueChange={handleClassChange}>
                   <SelectTrigger className="w-full sm:w-[180px] bg-white">
                     <GraduationCap className="w-4 h-4 mr-2 text-slate-400" />
                     <SelectValue placeholder="Select Class" />
@@ -227,7 +248,7 @@ export default function AbsencesPage() {
               </div>
             ) : (
               <div className="divide-y divide-slate-100">
-                {filteredAbsences.map((absence) => (
+                {paginatedAbsences.map((absence) => (
                   <div key={absence._id} className="bg-white">
                     {/* Record Header */}
                     <div
@@ -327,6 +348,19 @@ export default function AbsencesPage() {
                   </div>
                 ))}
               </div>
+            )}
+
+            {/* Pagination */}
+            {!loading && totalItems > 0 && (
+              <Pagination
+                totalItems={totalItems}
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+                itemLabel="records"
+                className="border-t px-4"
+              />
             )}
           </CardContent>
         </Card>
