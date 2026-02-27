@@ -31,6 +31,7 @@ import {
   ArrowLeft,
   Loader2,
 } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 
 interface Assignment {
   _id: string;
@@ -47,6 +48,8 @@ export default function AssignmentsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterClass, setFilterClass] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   useEffect(() => {
     fetchAssignments();
@@ -76,6 +79,24 @@ export default function AssignmentsPage() {
       return matchesSearch && matchesClass;
     })
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  // Paginate
+  const totalItems = filteredAssignments.length;
+  const paginatedAssignments = filteredAssignments.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to page 1 when filters change
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
+
+  const handleFilterClass = (value: string) => {
+    setFilterClass(value);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -128,11 +149,11 @@ export default function AssignmentsPage() {
                 <Input
                   placeholder="Search by class or subject..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => handleSearch(e.target.value)}
                   className="pl-10"
                 />
               </div>
-              <Select value={filterClass} onValueChange={setFilterClass}>
+              <Select value={filterClass} onValueChange={handleFilterClass}>
                 <SelectTrigger className="w-full md:w-[180px]">
                   <Filter className="w-4 h-4 mr-2" />
                   <SelectValue placeholder="Filter by Class" />
@@ -189,7 +210,7 @@ export default function AssignmentsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredAssignments.map((assignment) => (
+                    {paginatedAssignments.map((assignment) => (
                       <TableRow
                         key={assignment._id}
                         className="hover:bg-slate-50"
@@ -235,6 +256,19 @@ export default function AssignmentsPage() {
                   </TableBody>
                 </Table>
               </div>
+            )}
+
+            {/* Pagination */}
+            {!loading && totalItems > 0 && (
+              <Pagination
+                totalItems={totalItems}
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+                itemLabel="assignments"
+                className="border-t mt-4 pt-2"
+              />
             )}
           </CardContent>
         </Card>
