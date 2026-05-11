@@ -30,7 +30,7 @@ This is stronger than a pure background-only app and operationally realistic for
 - Device-to-customer mapping + barcode/serial tracking
 
 ## 3) Warehouse Workflow (Per Fresh TV)
-1. Power on Fresh TV and complete basic wizard.
+1. Power on a new TV device and complete basic wizard.
 2. **Skip Google sign-in** during provisioning phase.
 3. Enable developer options + ADB.
 4. Run provisioning script:
