@@ -31,7 +31,7 @@ This is stronger than a pure background-only app and operationally realistic for
 
 ## 3) Warehouse Workflow (Per Fresh TV)
 1. Power on a new TV device and complete basic wizard.
-2. **Skip Google sign-in** during provisioning phase to avoid account association that can block Device Owner setup.
+2. **Skip Google sign-in** during provisioning phase to avoid account association that can block Device Owner setup (if missed, factory reset is usually required).
 3. Enable developer options + ADB.
 4. Run provisioning script:
    - connect ADB
@@ -44,7 +44,7 @@ This is stronger than a pure background-only app and operationally realistic for
 6. Reboot and verify auto-start.
 7. Label, map to customer record, repack.
 
-Typical throughput target after 2–3 days of staff training: ~10–15 minutes per TV.
+Typical throughput target after 2–3 days of staff training: ~10–15 minutes per TV **per technician** (single-station workflow).
 
 ## 4) Enforcement Workflow
 - **Pre-due / soft reminder:** banners/messages.
@@ -70,7 +70,7 @@ Typical throughput target after 2–3 days of staff training: ~10–15 minutes p
 - Legal/compliance setup: **$1k–$5k**
 - Initial infra + monitoring (first months): **$500–$2k**
 
-**Estimated total:** ~**$12.5k–$39k** depending on scope, model coverage, and support quality.
+**Estimated one-time delivery total:** ~**$12.5k–$39k** depending on scope, model coverage, and support quality.\n\n**Ongoing ops cost:** infra/monitoring and support are additional recurring expenses.
 
 ## 7) Suggested Delivery Phases
 1. **Discovery & policy design (1–2 weeks)**
