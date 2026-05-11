@@ -31,7 +31,7 @@ This is stronger than a pure background-only app and operationally realistic for
 
 ## 3) Warehouse Workflow (Per Fresh TV)
 1. Power on a new TV device and complete basic wizard.
-2. **Skip Google sign-in** during provisioning phase.
+2. **Skip Google sign-in** during provisioning phase to avoid account association that can block Device Owner setup.
 3. Enable developer options + ADB.
 4. Run provisioning script:
    - connect ADB
@@ -44,7 +44,7 @@ This is stronger than a pure background-only app and operationally realistic for
 6. Reboot and verify auto-start.
 7. Label, map to customer record, repack.
 
-Typical throughput target after 2–3 days of staff training: ~10 minutes per TV.
+Typical throughput target after 2–3 days of staff training: ~10–15 minutes per TV.
 
 ## 4) Enforcement Workflow
 - **Pre-due / soft reminder:** banners/messages.
