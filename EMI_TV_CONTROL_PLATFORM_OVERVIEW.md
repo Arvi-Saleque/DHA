@@ -31,20 +31,21 @@ This is stronger than a pure background-only app and operationally realistic for
 
 ## 3) Warehouse Workflow (Per New TV Device)
 1. Power on a new TV device and complete basic wizard.
-2. **Skip Google sign-in** during provisioning phase to avoid account association that can block Device Owner setup (if missed, treat factory reset as required before retrying provisioning).
-3. Enable developer options + ADB.
-4. Run provisioning script:
+2. **Skip Google sign-in** during provisioning phase to avoid account association that can block Device Owner setup.
+3. If Google sign-in is completed by mistake before Device Owner setup, treat factory reset as required before retrying provisioning.
+4. Enable developer options + ADB.
+5. Run provisioning script:
    - connect ADB
    - install APK
    - set Device Owner
    - trigger first launch and registration
    - apply policy baseline
    - verify heartbeat/dashboard presence
-5. Disable debugging/developer settings.
-6. Reboot and verify auto-start.
-7. Label, map to customer record, repack.
+6. Disable debugging/developer settings.
+7. Reboot and verify auto-start.
+8. Label, map to customer record, repack.
 
-Typical throughput target after 2–3 days of staff training: ~10–15 minutes per TV **per technician** (single-station workflow).
+Typical single-station throughput target after 2–3 days of staff training: ~10–15 minutes per TV.
 
 ## 4) Enforcement Workflow
 - **Pre-due / soft reminder:** banners/messages.
@@ -55,7 +56,7 @@ Typical throughput target after 2–3 days of staff training: ~10–15 minutes p
 
 ## 5) Main Challenges You Should Expect
 - **Device fragmentation:** OEM behavior differs; test each TV model before bulk rollout.
-- **Provisioning mistakes:** Google account sign-in too early during provisioning can break Device Owner flow (requires reset).
+- **Provisioning mistakes:** an incorrect setup order (see warehouse workflow step 3) can force reset/reprovisioning.
 - **Connectivity gaps:** lock/unlock depends on network availability and reliable retries.
 - **Tampering risk:** advanced users may attempt reset/recovery paths.
 - **Operational discipline:** staff training and strict SOP compliance are critical.
