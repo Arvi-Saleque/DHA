@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+// Next.js emits small inline bootstrap/runtime snippets unless CSP nonces are wired via middleware.
+// Keep 'unsafe-inline' for scripts/styles to avoid breaking hydration in this static-header setup.
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
