@@ -29,9 +29,9 @@ This is stronger than a pure background-only app and operationally realistic for
 - Per-device onboarding checklist
 - Device-to-customer mapping + barcode/serial tracking
 
-## 3) Warehouse Workflow (Per Fresh TV)
+## 3) Warehouse Workflow (Per New TV Device)
 1. Power on a new TV device and complete basic wizard.
-2. **Skip Google sign-in** during provisioning phase to avoid account association that can block Device Owner setup (if missed, factory reset is usually required).
+2. **Skip Google sign-in** during provisioning phase to avoid account association that can block Device Owner setup (if missed, treat factory reset as required before retrying provisioning).
 3. Enable developer options + ADB.
 4. Run provisioning script:
    - connect ADB
@@ -70,7 +70,9 @@ Typical throughput target after 2–3 days of staff training: ~10–15 minutes p
 - Legal/compliance setup: **$1k–$5k**
 - Initial infra + monitoring (first months): **$500–$2k**
 
-**Estimated one-time delivery total:** ~**$12.5k–$39k** depending on scope, model coverage, and support quality.\n\n**Ongoing ops cost:** infra/monitoring and support are additional recurring expenses.
+**Estimated one-time delivery total:** ~**$12.5k–$39k** depending on scope, model coverage, and support quality.
+
+**Ongoing ops cost:** infra/monitoring and support are additional recurring expenses.
 
 ## 7) Suggested Delivery Phases
 1. **Discovery & policy design (1–2 weeks)**
