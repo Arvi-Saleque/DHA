@@ -3,9 +3,9 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { comparePassword, generateToken } from "@/lib/auth";
 
-// Hardcoded admin credentials
-const ADMIN_USERNAME = "adminDHA";
-const ADMIN_PASSWORD = "REDACTED-ROTATED-2026-08-08";
+// Admin credentials are sourced from environment variables (set in .env.local / Vercel project settings)
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,8 +22,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check hardcoded admin credentials first
-    if (loginIdentifier === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    // Check admin credentials first (from environment variables)
+    if (
+      ADMIN_USERNAME &&
+      ADMIN_PASSWORD &&
+      loginIdentifier === ADMIN_USERNAME &&
+      password === ADMIN_PASSWORD
+    ) {
       const token = "admin-hardcoded-token-" + Date.now();
       
       return NextResponse.json({
