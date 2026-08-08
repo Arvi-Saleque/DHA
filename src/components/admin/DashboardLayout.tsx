@@ -125,6 +125,11 @@ const menuItems: MenuItem[] = [
     icon: <Settings className="h-5 w-5" />,
     href: "/admin/footer-settings",
   },
+  {
+    title: "Audit Log",
+    icon: <ClipboardList className="h-5 w-5" />,
+    href: "/admin/audit-log",
+  },
 ];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import type { NextFetchEvent, NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
 const AUTH_COOKIE_NAME = 'admin_session';
@@ -11,11 +11,14 @@ const JWT_SECRET = new TextEncoder().encode(
 const PUBLIC_PATHS = new Set(['/api/auth/login', '/api/auth/logout']);
 
 // Non-GET (write) requests that must stay public even though their path is
-// otherwise admin-protected by default (e.g. public form submissions).
+// otherwise admin-protected by default (e.g. public form submissions, and
+// the audit-log sink itself, which authenticates via a shared secret instead
+// of a user session).
 const PUBLIC_WRITES = new Set([
   'POST /api/contact-messages',
   'POST /api/newsletter',
   'POST /api/reviews',
+  'POST /api/audit-log',
 ]);
 
 // GET requests that must stay admin-protected even though GET is public by
@@ -25,6 +28,7 @@ const PROTECTED_READS = new Set([
   '/api/newsletter',
   '/api/users',
   '/api/cloudinary-images',
+  '/api/audit-log',
 ]);
 
 function isPublicRequest(request: NextRequest, pathname: string): boolean {
@@ -40,23 +44,54 @@ function isPublicRequest(request: NextRequest, pathname: string): boolean {
   return PUBLIC_WRITES.has(`${request.method} ${pathname}`);
 }
 
-async function isAuthenticated(request: NextRequest): Promise<boolean> {
+async function getSession(
+  request: NextRequest
+): Promise<{ userId: string; role: string } | null> {
   const bearer = request.headers.get('authorization');
   const token = bearer?.startsWith('Bearer ')
     ? bearer.slice(7)
     : request.cookies.get(AUTH_COOKIE_NAME)?.value;
 
-  if (!token) return false;
+  if (!token) return null;
 
   try {
-    await jwtVerify(token, JWT_SECRET);
-    return true;
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    return { userId: String(payload.userId), role: String(payload.role) };
   } catch {
-    return false;
+    return null;
   }
 }
 
-export async function middleware(request: NextRequest) {
+function logAuditEntry(
+  request: NextRequest,
+  event: NextFetchEvent,
+  session: { userId: string; role: string },
+  pathname: string
+) {
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'unknown';
+
+  event.waitUntil(
+    fetch(new URL('/api/audit-log', request.url), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.INTERNAL_API_SECRET || '',
+      },
+      body: JSON.stringify({
+        userId: session.userId,
+        role: session.role,
+        method: request.method,
+        path: pathname,
+        ip,
+      }),
+    }).catch(() => {})
+  );
+}
+
+export async function middleware(request: NextRequest, event: NextFetchEvent) {
   const origin = request.headers.get('origin');
 
   // Handle preflight requests
@@ -73,12 +108,23 @@ export async function middleware(request: NextRequest) {
   }
 
   const pathname = request.nextUrl.pathname;
+  const isPublic = isPublicRequest(request, pathname);
 
-  if (!isPublicRequest(request, pathname) && !(await isAuthenticated(request))) {
-    return NextResponse.json(
-      { success: false, message: 'Unauthorized' },
-      { status: 401 }
-    );
+  let session: { userId: string; role: string } | null = null;
+  if (!isPublic) {
+    session = await getSession(request);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+  }
+
+  // Record write actions by authenticated users, excluding the audit-log
+  // sink itself (which isn't user-session-backed) to avoid recursive noise.
+  if (session && request.method !== 'GET' && pathname !== '/api/audit-log') {
+    logAuditEntry(request, event, session, pathname);
   }
 
   const response = NextResponse.next();
