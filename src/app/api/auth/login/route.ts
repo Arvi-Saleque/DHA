@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
-import { comparePassword, generateToken } from "@/lib/auth";
+import {
+  comparePassword,
+  generateToken,
+  AUTH_COOKIE_NAME,
+  AUTH_COOKIE_MAX_AGE,
+} from "@/lib/auth";
 
 // Admin credentials are sourced from environment variables (set in .env.local / Vercel project settings)
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
@@ -29,9 +34,9 @@ export async function POST(request: NextRequest) {
       loginIdentifier === ADMIN_USERNAME &&
       password === ADMIN_PASSWORD
     ) {
-      const token = "admin-hardcoded-token-" + Date.now();
-      
-      return NextResponse.json({
+      const token = generateToken("admin", "admin");
+
+      const response = NextResponse.json({
         success: true,
         message: "Login successful",
         token,
@@ -43,6 +48,14 @@ export async function POST(request: NextRequest) {
           profileImage: null,
         },
       });
+      response.cookies.set(AUTH_COOKIE_NAME, token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: AUTH_COOKIE_MAX_AGE,
+      });
+      return response;
     }
 
     // If not hardcoded admin, try database authentication
@@ -70,7 +83,7 @@ export async function POST(request: NextRequest) {
     const token = generateToken(user._id.toString(), user.role);
 
     // Return success response
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: "Login successful",
       token,
@@ -82,6 +95,14 @@ export async function POST(request: NextRequest) {
         profileImage: user.profileImage,
       },
     });
+    response.cookies.set(AUTH_COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: AUTH_COOKIE_MAX_AGE,
+    });
+    return response;
   } catch (error: any) {
     console.error("Login error:", error);
     return NextResponse.json(

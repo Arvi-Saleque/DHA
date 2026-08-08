@@ -157,7 +157,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     setOpenSubmenu(openSubmenu === title ? null : title);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (e) {
+      console.error("Error clearing server session:", e);
+    }
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminUser");
     window.location.href = "/admin/login";
