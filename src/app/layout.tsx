@@ -1,12 +1,9 @@
-"use client";
-
-import { GoogleAnalytics } from '@next/third-parties/google'
+import type { Metadata } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/common/navbar";
-import Footer from "@/components/common/footer";
-import LoadingScreen from "@/components/common/loading-screen";
-import { usePathname } from "next/navigation";
+import SiteShell from "@/components/common/site-shell";
+import { SCHOOL, SCHOOL_JSON_LD, SITE_DESCRIPTION, SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,38 +15,59 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const DEFAULT_TITLE = "দারুল হিকমাহ একাডেমি, খুলনা | হিফজ ও জেনারেল শিক্ষা";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: { default: DEFAULT_TITLE, template: `%s | ${SCHOOL.nameBn}` },
+  description: SITE_DESCRIPTION,
+  keywords: [
+    "দারুল হিকমাহ একাডেমি খুলনা",
+    "Darul Hikmah Academy Khulna",
+    "খুলনা হিফজ মাদ্রাসা",
+    "খুলনা ইসলামিক স্কুল",
+    "হিফজ ও জেনারেল সমন্বিত",
+    "বালিকা মাদ্রাসা খুলনা",
+    "Islamic school Khulna",
+    "Hifz madrasa Khulna",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: SCHOOL.nameBn,
+    locale: "bn_BD",
+    title: DEFAULT_TITLE,
+    description: SITE_DESCRIPTION,
+    url: "/",
+    images: ["/images/cover.png"],
+  },
+  icons: {
+    icon: [
+      { url: "/images/favicon.ico" },
+      { url: "/images/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/images/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/images/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/images/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: { url: "/images/apple-touch-icon.png", sizes: "180x180" },
+  },
+};
+
+export const viewport = { themeColor: "#0891b2" };
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const isAdminRoute = pathname?.startsWith("/admin");
-
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/images/android-chrome-192x192.png" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/images/android-chrome-512x512.png" />
-        <meta name="theme-color" content="#0891b2" />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <LoadingScreen />
-        {isAdminRoute ? (
-          children
-        ) : (
-          <>
-            <Navbar />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
-          </>
-        )}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHOOL_JSON_LD) }}
+        />
+        <SiteShell>{children}</SiteShell>
         <GoogleAnalytics gaId="G-E7772SZ5HK" />
       </body>
     </html>
