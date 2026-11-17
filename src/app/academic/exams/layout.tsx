@@ -1,0 +1,7 @@
+import { pageMeta } from "@/lib/site";
+
+export const metadata = pageMeta("পরীক্ষার সময়সূচি", "দারুল হিকমাহ একাডেমি, খুলনার পরীক্ষার রুটিন।", "/academic/exams");
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return children;
+}
